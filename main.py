@@ -21,6 +21,8 @@ def is_valid(url):
 def get_month(name):
     if name== "Aug":
         return "08"
+    if name== "Sep":
+        return "09"
 
 
 def get_time(name):
