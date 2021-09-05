@@ -40,12 +40,14 @@ def get_tide(url):
 
 
 def main():
-    locations = {"holyhead","conwy","dover","beaumaris","cemaes-bay"}
+    #locations = {"holyhead","conwy","dover","beaumaris","cemaes-bay"}
+    locations = {"conwy"}
+
     url_base = "https://www.tidetimes.org.uk/"
     url_tide = "-tide-times-"
     now = datetime.now()
-    tides = []
-    dates = []
+    locations_tide_calendar = []
+    tide_dates = []
     for i in range(0, 7):
         target = now + timedelta(days=i)
         year = target.strftime("%Y")
@@ -53,21 +55,31 @@ def main():
         day = target.strftime("%d")
         url_date = year + month + day
 
-        dates.append(url_date)
+        tide_dates.append(url_date)
 
     for location in locations:
-        for target_date in dates:
+
+        tide_calendar = []
+        for target_date in tide_dates:
             url = url_base + location + url_tide + target_date
             print(url)
             times = get_tide(url)
-            tide = {
-                "location":location,
-                "date":target_date,
-                "times":times
+            tide_date = {
+                target_date:times
             }
-            tides.append(tide)
+            tide_calendar.append(tide_date)
 
-    pprint(tides)
+        location_tide_calendar = {
+            location: tide_calendar
+        }
+        locations_tide_calendar.append(location_tide_calendar)
+
+    filename = 'navigation/tides.json'
+
+    with open(filename, 'w') as outfile:
+        json.dump(locations_tide_calendar,outfile)
+
+    pprint(locations_tide_calendar)
 
 if __name__== "__main__":
     main()
