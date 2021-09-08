@@ -1,0 +1,18 @@
+[
+  {
+    "url": "https://www.tidetimes.org.uk/LOCATION-tide-times-DATE",
+    "type": "tide-times",
+    "DATE": "YYYYMMDD"
+  },
+  {
+    "url": "https://www.metoffice.gov.uk/weather/specialist-forecasts/coast-and-sea/inshore-waters-forecast",
+    "type": "inshore"
+  },
+  {
+    "url": "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure",
+    "type": "pressure"
+  },
+  {
+    "url": "https://www.metoffice.gov.uk/weather/forecast/gcmr0gu3s#?date=2021-09-07"
+  }
+]

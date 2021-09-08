@@ -1,0 +1,22 @@
+[
+  {
+    "name": "Conwy",
+    "type": "home",
+    "keys": [
+      {
+        "tide": "conwy",
+        "weather": "gcmr0gu3s"
+      }
+    ]
+  },
+  {
+    "name": "Holyhead",
+    "type": "table",
+    "keys": [
+      {
+        "tide": "holyhead",
+        "weather": "gckxq8ehx"
+      }
+    ]
+  }
+]
