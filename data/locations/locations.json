@@ -5,6 +5,12 @@
     "keys": [
       {
         "tide": "conwy",
+        "gate": [
+          {
+            "open": "-3",
+            "close": "+3"
+          }
+        ],
         "weather": "gcmr0gu3s"
       }
     ]

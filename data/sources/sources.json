@@ -13,6 +13,7 @@
     "type": "pressure"
   },
   {
-    "url": "https://www.metoffice.gov.uk/weather/forecast/gcmr0gu3s#?date=2021-09-07"
+    "type": "weather",
+    "url": "https://www.metoffice.gov.uk/weather/forecast/LOCATION?date=DATE"
   }
 ]
