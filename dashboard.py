@@ -7,6 +7,7 @@ import bs4.element
 from bs4 import BeautifulSoup as bs
 import requests
 
+
 def get_date(target):
     date = {
         "year": target.strftime("%Y"),
@@ -20,20 +21,26 @@ def get_date(target):
 def get_dates():
     dates = []
     now = datetime.now()
-    for i in range(0, 14):
+    for i in range(0, 7):
         target = now + timedelta(days=i)
         date = get_date(target)
         dates.append(date)
     return dates
 
 
-def create_folder(date_url, location_name):
-
+def check_folder(date_url, location_name):
     pathname = "data/forecast/" + date_url + "/" +  location_name.lower()
-
     if not os.path.isdir(pathname):
         os.makedirs(pathname)
     return pathname
+
+
+def write_data(date_url, location_name, time, content_type, data):
+    pathname = check_folder(date_url, location_name)
+    time_url = time[:2] + time[3:5]
+    filename = pathname + '/' + time_url + '-' + content_type.lower() + '.json'
+    with open(filename, 'w') as outfile:
+        json.dump(data, outfile)
 
 
 def get_locations():
@@ -42,6 +49,7 @@ def get_locations():
     locations = json.loads(data)
     return locations
 
+
 def get_sources():
     with open('data/sources/sources.json','r') as sourcefile:
         data = sourcefile.read()
@@ -49,32 +57,25 @@ def get_sources():
     return sources
 
 
-def get_times(pathname, tide_source, date, location):
+def get_times(tide_source, date, location):
+
     url = tide_source
     location_tide_name = location['keys'][0]['tide']
     url = url.replace('LOCATION',location_tide_name)
     url = url.replace('DATE',date['url'])
     soup = bs(requests.get(url).content, "html.parser")
-    tides = get_timetable(soup)
-    universe = get_universe(soup)
 
-    times = {
-        'tides': tides,
-        'universe': universe
-    }
+    tides = get_timetable(soup)
+    for tide in tides:
+        write_data(date['url'], location['name'], tide['time'], tide['type'], tide)
+
+    universe = get_universe(soup)
+    for movement in universe:
+        write_data(date['url'], location['name'], movement['time'], movement['type'], movement)
 
     for key in location['keys'][0]:
         if key=='gate':
             gates = get_gatetimes(location, date, tides)
-            times = {
-                'tides': tides,
-                'universe': universe,
-                'gates': gates
-            }
-
-    filename = pathname + '/times.json'
-    with open(filename, 'w') as outfile:
-        json.dump(times,outfile)
 
 
 def get_timetable(soup):
@@ -91,27 +92,24 @@ def get_timetable(soup):
                     time_value = time_value.contents[0]
                     depth_value = row.contents[5]
                     depth_value = depth_value.contents[0]
+                    if (position_value == 'High'):
+                        type = 'hightide'
+
+                    if (position_value == 'Low'):
+                        type = 'lowtide'
+
                     time = {
-                        "Hi/Lo": position_value,
+                        "type": type,
                         "depth": depth_value,
-                        "time": time_value
+                        "time": str(time_value)
                     }
                     tides.append(time)
     return tides
 
 
 def get_universe(soup):
-    sun = {
-        'rise': '',
-        'set': '',
-        'graphic': ''
-    }
-    moon = {
-        'rise': '',
-        'set': '',
-        'phase': '',
-        'graphic': ''
-    }
+    universe = []
+    moon = {'type': 'moonrise'}
 
     for phase in soup.find_all(id="phase"):
         index = 0
@@ -119,37 +117,55 @@ def get_universe(soup):
             if isinstance(row, bs4.element.Tag):
                 index = index + 1
 
-                if index==1:
-                    for img in row.find_all('img'):
-                        sun['graphic'] = img['src']
-
                 if index==2:
                     for rise in row.find_next('span'):
-                        sun['rise'] = str(rise)
+                        sunrise = str(rise)
+                        time = sunrise[:5]
+                        out = {
+                            'type': 'sunrise',
+                            'time': time
+                        }
+                        universe.append(out)
 
                 if index==3:
                     for set in row.find_next('span'):
-                        sun['set'] = str(set)
+                        sunset = str(set)
+                        time = sunset[:5]
+                        out = {
+                            'type': 'sunset',
+                            'time': time
+                        }
+                        universe.append(out)
 
                 if index==4:
                     for img in row.find_all('img'):
-                        moon['graphic'] = img['src']
+                        moon_graphic = img['src']
+                        #moon['graphic'] = str(moon_graphic)
 
                 if index==5:
                     for rise in row.find_next('span'):
-                        moon['rise'] = str(rise)
+                        moonrise = str(rise)
+                        time = moonrise[:5]
+                        moon['time'] = time
 
                 if index==6:
                     for set in row.find_next('span'):
-                        moon['set'] = str(set)
+                        moonset = str(set)
+                        time = moonset[:5]
+                        out = {
+                            'type': 'moonset',
+                            'time': time
+                        }
+                        universe.append(out)
 
                 if index==7:
-                    moon['phase'] = str(row.contents[1])
+                    moon_phase = str(row.contents[1])
+                    #moon['phase'] = moon_phase
 
-    return {
-        'sun': sun,
-        'moon': moon
-    }
+
+    universe.append(moon)
+
+    return universe
 
 
 def get_gatetimes(location, date, tides):
@@ -173,54 +189,38 @@ def get_gatetimes(location, date, tides):
     Get high_tide as datetime object
     """
     for tide in tides:
-        if tide['Hi/Lo']=='High':
+        if tide['type']=='hightide':
             tidetime = str(tide['time'])
             tidehour = int(tidetime[:2])
             tideminute = int(tidetime[3:5])
             tideyear = int(date['year'])
             tidemonth = int(date['month'])
             tideday = int(date['day'])
-            hightide = datetime(tideyear, tidemonth, tideday, tidehour, tideminute,0)
+
+            hightide = datetime(tideyear, tidemonth, tideday, tidehour, tideminute, 0)
+
             if open_diff == '-3':
                 gateopen = hightide + timedelta(hours=-3)
+                date_url = gateopen.strftime("%Y%m%d")
+                time = gateopen.strftime("%H:%M")
+                type = 'gateopen'
+                json = {
+                    'time': time,
+                    'type': type
+                }
+                write_data(date_url, location['name'], time, 'gateopen', json)
 
             if close_diff == '+3':
                 gateclose = hightide + timedelta(hours=+3)
+                date_url = gateclose.strftime("%Y%m%d")
+                time = gateclose.strftime("%H:%M")
+                type = 'gateopen'
+                json = {
+                    'time': time,
+                    'type': type
+                }
+                write_data(date_url, location['name'], time, 'gateclose', json)
 
-            open = {
-                "year": gateopen.strftime("%Y"),
-                "month": gateopen.strftime("%m"),
-                "day": gateopen.strftime("%d"),
-                'hour': gateopen.strftime('%H'),
-                'minute': gateopen.strftime('%M')
-            }
-
-            close = {
-                "year": gateclose.strftime("%Y"),
-                "month": gateclose.strftime("%m"),
-                "day": gateclose.strftime("%d"),
-                'hour': gateclose.strftime('%H'),
-                'minute': gateclose.strftime('%M')
-            }
-
-            outtime = {
-                'tide': tidetime,
-                "year": tideyear,
-                "month": tidemonth,
-                "day": tideday,
-                'hour': tidehour,
-                'minute': tideminute
-            }
-
-            outtide = {
-                'tide': outtime,
-                'open': open,
-                'close': close
-            }
-
-            outgates.append(outtide)
-
-    return outgates
 
 
 def main():
@@ -237,8 +237,7 @@ def main():
 
     for date in dates:
         for location in locations:
-            pathname = create_folder(date['url'], location['name'])
-            get_times(pathname, tide_source, date, location)
+            get_times(tide_source, date, location)
 
 
 
