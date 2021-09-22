@@ -29,7 +29,7 @@ def get_dates():
 
 
 def check_folder(date_url, location_name):
-    pathname = "data/forecast/" + date_url + "/" +  location_name.lower()
+    pathname = "data/forecast/" + date_url
     if not os.path.isdir(pathname):
         os.makedirs(pathname)
     return pathname
@@ -38,7 +38,7 @@ def check_folder(date_url, location_name):
 def write_data(date_url, location_name, time, content_type, data):
     pathname = check_folder(date_url, location_name)
     time_url = time[:2] + time[3:5]
-    filename = pathname + '/' + time_url + '-' + content_type.lower() + '.json'
+    filename = pathname + '/' + time_url + '-' + location_name.lower() + '-' + content_type.lower() + '.json'
     print(filename)
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
@@ -239,6 +239,7 @@ def main():
     for date in dates:
         for location in locations:
             get_times(tide_source, date, location)
+
 
 
 

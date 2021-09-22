@@ -8,7 +8,7 @@ import json
 from tqdm import tqdm
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse
-
+from datetime import datetime
 
 def is_valid(url):
     """
@@ -19,17 +19,52 @@ def is_valid(url):
 
 
 def get_month(name):
+    if name== "Jan":
+        return "01"
+    if name== "Feb":
+        return "02"
+    if name== "Mar":
+        return "03"
+    if name== "Apr":
+        return "04"
+    if name== "May":
+        return "05"
+    if name== "Jun":
+        return "06"
+    if name== "Jul":
+        return "07"
     if name== "Aug":
         return "08"
     if name== "Sep":
         return "09"
+    if name== "Oct":
+        return "10"
+    if name== "Nov":
+        return "11"
+    if name== "Dec":
+        return "12"
 
 
 def get_time(name):
     if name == "00:00":
-        return "AM"
+        return "0000"
     else:
-        return "PM"
+        return "1200"
+
+def get_range(name):
+    name = name[5:]
+    type = name[:-1]
+    range = int(name[-1:])
+
+    if range > 0:
+        range = range * 12
+
+    if range == 0:
+        output = 'analysis-' + type.lower()
+    else:
+        output = 'outlook-' + type.lower() + '-' + str(range) + '-hrs'
+
+    return output
 
 
 def get_forecasts(url):
@@ -104,6 +139,7 @@ def get_maps(url):
         for row in list(rows.children):
             if isinstance(row, bs4.element.Tag):
                 label = row.attrs.get("id")
+                label = get_range(label)
                 date = row.attrs.get("data-value")
 
                 date_parts = date.split()
@@ -112,8 +148,7 @@ def get_maps(url):
                 month_name = date_parts[5]
                 month = get_month(month_name)
                 year = date_parts[6]
-                time_value = date_parts[0]
-                time = get_time(time_value)
+                time = date_parts[0]
 
                 for image in list(row.children):
                     if isinstance(image, bs4.element.Tag):
@@ -128,6 +163,7 @@ def get_maps(url):
         for row in list(rows.children):
             if isinstance(row, bs4.element.Tag):
                 label = row.attrs.get("id")
+                label = get_range(label)
                 date = row.attrs.get("data-value")
 
                 date_parts = date.split()
@@ -136,8 +172,7 @@ def get_maps(url):
                 month_name = date_parts[5]
                 month = get_month(month_name)
                 year = date_parts[6]
-                time_value = date_parts[0]
-                time = get_time(time_value)
+                time = date_parts[0]
 
                 for image in list(row.children):
                     if isinstance(image, bs4.element.Tag):
@@ -151,22 +186,20 @@ def get_maps(url):
     return maps
 
 
-def download_map(forecast,map):
-    year = forecast[1]
-    month = forecast[2]
-    day = forecast[3]
-    time = forecast[4]
-    type = forecast[5]
+def download_map(map):
+    year = map[1]
+    month = map[2]
+    day = map[3]
+    time = map[4]
+    time = get_time(time)
 
     url = map[0]
     label = map[6]
 
-    pathname = 'forecast/' + year + '-' + month + '-' + day + '-' + time
-    filename = pathname + '/'+ label + '.gif'
-    ux_filename = 'navigation/' + label + '.gif'
+    pathname = 'data/forecast/' + year + month + day
+    filename = pathname + '/'+ time + '-pressure-map-' + label +'.gif'
 
     download_file(pathname, filename, url)
-    copy_file(filename,ux_filename)
 
 
 def copy_file(source, destination):
@@ -213,23 +246,18 @@ def download_file(pathname, filename, url):
             progress.update(len(data))
 
 
-def save(maps, forecasts):
-    year=maps[0][1]
-    month=maps[0][2]
-    day=maps[0][3]
-    time=maps[0][4]
+def save(forecasts):
+    now = datetime.now()
+    date = now.strftime("%Y%m%d")
+    area = 0;
 
-    pathname = 'forecast/' + year + '-' + month + '-' + day + '-' + time
-    filename = pathname + '/data.json'
-
-    with open(filename, 'w') as outfile:
-        json.dump(forecasts, outfile)
-
-    filename = 'navigation/data.json'
-
-    with open(filename, 'w') as outfile2:
-        json.dump(forecasts, outfile2)
-
+    for forecast in forecasts:
+        if (area > 0):
+            pathname = 'data/forecast/' + date
+            filename = pathname + '/0000-inshore-area-' + str(area) + '.json'
+            with open(filename, 'w') as outfile:
+                json.dump(forecast, outfile)
+        area = area + 1;
 
 def main():
     pressure = "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure"
@@ -239,14 +267,12 @@ def main():
     maps = get_maps(pressure)
     for map in maps:
         # for each img, download it
-        download_map(maps[0],map)
+        download_map(map)
 
         # get all inshore forecasts
         forecasts = get_forecasts(inshore)
-    #    for forecast in forecasts:
-    # download_forecast(maps[0],forecast)
 
-    save(maps,forecasts)
+    save(forecasts)
 
 if __name__ == "__main__":
     main()

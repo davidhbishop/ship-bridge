@@ -12,7 +12,7 @@
         $day['dayofmonth'] = date_format($current_day, "d");
         $day['dayofweek'] = date_format($current_day,"D");
         $day['date']= date_format($current_day, "Ymd");
-        $day['path'] = 'data/forecast/' . strval($day['date']) . '/conwy';
+        $day['path'] = 'data/forecast/' . strval($day['date']);
 
         if (is_dir($day['path'])) {
 
