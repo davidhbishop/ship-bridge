@@ -21,7 +21,7 @@ def get_date(target):
 def get_dates():
     dates = []
     now = datetime.now()
-    for i in range(0, 7):
+    for i in range(0, 15):
         target = now + timedelta(days=i)
         date = get_date(target)
         dates.append(date)
@@ -39,6 +39,7 @@ def write_data(date_url, location_name, time, content_type, data):
     pathname = check_folder(date_url, location_name)
     time_url = time[:2] + time[3:5]
     filename = pathname + '/' + time_url + '-' + content_type.lower() + '.json'
+    print(filename)
     with open(filename, 'w') as outfile:
         json.dump(data, outfile)
 

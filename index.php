@@ -36,7 +36,6 @@ include 'header.php';
             <div class="uk-width-2-3">
 
                 <?php
-
                 if ($page > 0) {
                     $area = $page;
                     $forecast = $forecasts[$area];
