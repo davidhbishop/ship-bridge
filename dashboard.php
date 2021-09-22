@@ -8,7 +8,6 @@
 
     for ($x = 0; $x < 7; $x++) {
         $day = array();
-        $current_day = date_add($current_day, date_interval_create_from_date_string('1 days'));
 
         $day['dayofmonth'] = date_format($current_day, "d");
         $day['dayofweek'] = date_format($current_day,"D");
@@ -31,6 +30,7 @@
         }
 
         $days[$day['date']] = $day;
+        $current_day = date_add($current_day, date_interval_create_from_date_string('1 days'));
     }
 
 ?>
@@ -38,6 +38,7 @@
 
 <?php include 'template/header.php' ?>
 
-<?php include 'template/contents.php' ?>
+<?php include 'template/teaser.php' ?>
+<?php include 'template/table.php' ?>
 
 <?php include 'template/footer.php' ?>
