@@ -259,7 +259,7 @@ def save(forecasts):
                 json.dump(forecast, outfile)
         area = area + 1;
 
-def main():
+def process_forecast():
     pressure = "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure"
     inshore = "https://www.metoffice.gov.uk/weather/specialist-forecasts/coast-and-sea/inshore-waters-forecast"
 
@@ -273,7 +273,4 @@ def main():
         forecasts = get_forecasts(inshore)
 
     save(forecasts)
-
-if __name__ == "__main__":
-    main()
 

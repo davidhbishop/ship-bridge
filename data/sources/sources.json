@@ -14,6 +14,6 @@
   },
   {
     "type": "weather",
-    "url": "https://www.metoffice.gov.uk/weather/forecast/LOCATION?date=DATE"
+    "url": "https://www.metoffice.gov.uk/weather/forecast/LOCATION"
   }
 ]
