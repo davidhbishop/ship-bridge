@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /var/www/html
-python3 main.py
+python3 dashboard.py

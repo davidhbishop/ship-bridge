@@ -5,7 +5,7 @@
     $data = null;
 
 ?>
-<div class="uk-grid uk-grid-collapse">
+<div class="uk-grid">
     <?php foreach($days as $key=>$value): ?>
         <?php
         $use = false;
@@ -19,17 +19,18 @@
         ?>
 
         <?php if ($use): ?>
-                    <div class="uk-width-1-4">
-                        <div class="uk-panel uk-panel-box">
-                            <div class="uk-panel-title"><h1><?php print $value['dayofweek']; ?> <?php print $value['dayofmonth'];?></h1></div>
-                        </div>
+                    <div class="uk-width-medium-1-4 uk-width-small-1-1">
+			<div class="uk-margin-left">
+                            <h1><?php print $value['dayofweek']; ?> <?php print $value['dayofmonth'];?></h1>
+			    <p class='uk-text-bold'>Conwy, wales</p>
 
-                        <div class="uk-panel uk-panel-box">
+                        
                                 <?php
 
                                 $forecasts = array();
 
                                 foreach($value['times'] as $event=>$data) {
+				    print '<p>'.$event.'</p>';
                                     if (strpos($event,'inshore')) {
                                         $index = substr($event,18);
                                         $index = substr($index, 0,strlen($index)-5);
@@ -43,45 +44,43 @@
                                     $forecast = $forecasts[$area];
                                     $name = $forecast['area'];
                                     $warning = $forecast['warning'];
-                                    print '<div class="uk-panel-title">'.$name.'</div><div class="uk-panel-body">';
+                                    print '<p>'.$name.'</p>';
                                     if (strlen($warning)>0) {
-                                        print '<div class="uk-alert-danger"><h3>' . $warning . '</h3></div>';
+                                        print '<div class="uk-alert-danger">' . $warning . '</div>';
                                     }
                                     if (isset($forecast['forecast'])) {
-                                        print '<h3>Forecast</h3>';
+                                        print '<table class="uk-table uk-table-striped">';
                                         foreach ($forecast['forecast'] as $key=>$info){
-                                            print '<div><strong>'.$key.'</strong></div><div>'.$info.'</div>';
+                                            print '<tr><th>'.$key.'</th><td>'.$info.'</td></tr>';
                                         }
+					print '</table>';
                                     }
                                     if (isset($forecast['outlook'])) {
-                                        print '<div class="uk-margin-top"><h3>Outlook</h3></div>';
+                                        print '<table class="uk-table uk-table-striped">';
                                         foreach ($forecast['outlook'] as $key=>$info){
-                                            print '<div><strong>'.$key.'</strong></div><div>'.$info.'</div>';
+                                            print '<tr><th>'.$key.'</th><td>'.$info.'</td></tr>';
                                         }
                                     }
+				    print '</table>';
 
-                                    print '</div>';
-
+				    print '<a href="?display=dashboard&date='.$current_date.'">Back</a>';
                                 } else {
-                                    print "<div class='uk-panel-body'><div class='uk-panel-title'>Forecasts</div>";
+                                    print "<table class='uk-table uk-table-striped'>";
 
                                     foreach ($forecasts as $area=>$forecast) {
                                         if ($area > 9 && $area < 13) {
-                                            print '<div><a class="uk-width-1-1 uk-button uk-align-left" href="?display=dashboard&area='.trim($area).'">'.$forecast["area"].'</a></div>';
+                                            print '<tr><td><a href="?display=dashboard&area='.trim($area).'&date='.$current_date.'">'.$forecast["area"].'</a></td></tr>';
                                         }
                                     }
 
-                                    print "</div>";
+                                    print "</table>";
                                 }
 
                                 ?>
-                        </div>
-
-
-
+			</div>
                     </div>
-                    <div class="uk-width-1-2">
-                        <table class="uk-table">
+                    <div class="uk-width-medium-1-2 uk-width-small-1-1">
+                        <table class="uk-table uk-table-striped">
 
                             <?php $displayTime = false; ?>
                             <?php foreach($value['times'] as $event=>$data):?>
@@ -135,7 +134,7 @@
                             <?php endforeach; ?>
                         </table>
                     </div>
-                    <div class="uk-width-1-4">
+                    <div class="uk-width-medium-1-4 uk-width-small-1-1">
                         <div class="uk-grid">
                             <?php foreach($value['times'] as $event=>$data):?>
                                 <?php if (strpos($event,'pressure')): ?>
