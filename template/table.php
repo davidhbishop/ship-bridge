@@ -19,11 +19,17 @@
         ?>
 
         <?php if ($use): ?>
-                    <div class="uk-width-1-6">
+                    <div class="uk-width-1-2">
                         <div><h1><?php print $value['dayofmonth'];?></h1></div>
                         <div><h2><?php print $value['dayofweek']; ?></h2></div>
+                        <div class="uk-grid uk-grid-colapse">
+                            <div class="uk-width-1-2"><?php print '<img src="/data/forecast/'.$current_date.'/0000-pressure-map-analysis-bw.gif"/>'; ?></div>
+                            <div class="uk-width-1-2"><?php print '<img src="/data/forecast/'.$current_date.'/0000-pressure-map-analysis-colour.gif"/>'; ?></div>
+                            <div class="uk-width-1-2"><?php print '<img src="/data/forecast/'.$current_date.'/1200-pressure-map-outlook-bw-12-hrs.gif"/>'; ?></div>
+                            <div class="uk-width-1-2"><?php print '<img src="/data/forecast/'.$current_date.'/1200-pressure-map-outlook-colour-12-hrs.gif"/>'; ?></div>
+                        </div>
                     </div>
-                    <div class="uk-width-5-6"> (mph)
+                    <div class="uk-width-1-2">
                         <table class="uk-table">
                             <thead>
                                 <th>Time</th>

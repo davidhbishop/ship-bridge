@@ -1,6 +1,38 @@
-<?php 
+<?php
+
+$days = array();
+$current_day = date_create();
+$today_date = date_format($current_day, "Ymd");
+
+for ($x = 0; $x < 7; $x++) {
+    $day = array();
+
+    $day['dayofmonth'] = date_format($current_day, "d");
+    $day['dayofweek'] = date_format($current_day,"D");
+    $day['date']= date_format($current_day, "Ymd");
+    $day['path'] = 'data/forecast/' . strval($day['date']);
+
+    if (is_dir($day['path'])) {
+
+        $files = scandir($day['path']);
+        $files = array_diff($files, array('.','..'));
+        $times = array();
+
+        foreach($files as $key=>$file){
+            $filepath = $day['path'] . '/' . $file;
+            $string = file_get_contents($filepath, FILE_USE_INCLUDE_PATH);
+            $json = json_decode($string, true);
+            $times[$file] = $json;
+        }
+        $day['times'] = $times;
+    }
+
+    $days[$day['date']] = $day;
+    $current_day = date_add($current_day, date_interval_create_from_date_string('1 days'));
+}
+
 	$page = 0;
-	$display = 'bw';
+	$display = 'dashboard';
 	if (isset($_GET['page'])) {
 		$page = $_GET['page'];
 	};
@@ -17,11 +49,14 @@
 	$situation = $forecasts[0]['general'];
 	$stamp = $forecasts[0]['stamp'];
 
-include 'header.php';
+    ?>
 
-?>
+<?php include 'template/header.php'; ?>
+<?php include 'template/teaser.php' ?>
 
-
+    <?php if ($display=="dashboard") :?>
+        <?php include 'template/table.php' ?>
+    <?php endif; ?>
 
 	<?php if ($display=="bw") {
 			print '<img class="uk-width-1-1" src="navigation/chartBW'.$page.'.gif" alt="">';
@@ -30,60 +65,11 @@ include 'header.php';
 			print '<img class="uk-width-1-1" src="navigation/chartColour'.$page.'.gif" alt="">';
 		}?>
 
-    <?php if ($display=="forecast") { ?>
+    <?php if ($display=="forecast") : ?>
 
-        <div class="uk-grid">
-            <div class="uk-width-2-3">
 
-                <?php
-                if ($page > 0) {
-                    $area = $page;
-                    $forecast = $forecasts[$area];
-                    $name = $forecast['area'];
-                    $warning = $forecast['warning'];
-                    $now = $forecast['forecast'][0];
-                    if (isset($forecast['forecast'][1])) {
-                        $outlook = $forecast['forecast'][1];
-                    }
-                    print '<div class="uk-grid"><div class="uk-width-1-1 uk-margin-large-bottom"><h2>'.$name.'</h2></div>';
-                    if (strlen($warning)>0) {
-                        print '<div class="uk-width-1-1 uk-alert-danger"><h3>' . $warning . '</h3></div>';
-                    }
-                    print '<div class="uk-width-1-2"><div class="uk-grid">';
-                    print '<div class="uk-width-1-1 uk-margin-bottom"><h3>Forecast</h3></div>';
-                    foreach ($now as $key=>$value){
-                        print '<div class="uk-width-1-6 uk-margin-bottom"><strong>'.$key.'</strong></div><div class="uk-width-5-6 uk-margin-bottom">'.$value.'</div>';
-                    }
-                    print '</div></div><div class="uk-width-1-2"><div class="uk-grid">';
-                    if (count($outlook)>0) {
-                        print '<div class="uk-width-1-1 uk-margin-bottom"><h3>Outlook</h3></div>';
-                        foreach ($outlook as $key=>$value){
-                            print '<div class="uk-width-1-6 uk-margin-bottom"><strong>'.$key.'</strong></div><div class="uk-width-5-6 uk-margin-bottom">'.$value.'</div>';
-                        }
-                    }
-                    print '</div></div>';
 
-                    print '</div>';
-
-                } else {
-                    print "<div class='uk-grid uk-grid-collapse'>";
-
-                    foreach ($forecasts as $key=>$forecast) {
-                        $area = $key;
-                        print '<div class="uk-width-1-2"><a class="uk-width-1-1 uk-button uk-align-left" href="?display=forecast&page='.trim($area).'">'.$forecast["area"].'</a></div>';
-                    }
-
-                    print "</div>";
-                }
-
-                ?>
-            </div>
-            <div class="uk-width-1-3">
-                <img src="navigation/inshore-map.png"/>
-            </div>
-        </div>
-
-    <?php } ?>
+    <?php endif;  ?>
 
 
  </body>

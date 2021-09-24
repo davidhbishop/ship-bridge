@@ -21,7 +21,7 @@
         ?>
 
         <?php if ($use): ?>
-            <div clas="uk-width-1-6">
+            <div class="uk-width-1-6">
                 <div class="uk-grid uk-grid-small">
                     <div class="uk-width-1-4">
                         <div class="uk-text-large"><?php print $value['dayofmonth'];?></div>
