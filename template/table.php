@@ -19,7 +19,7 @@
         ?>
 
         <?php if ($use): ?>
-                    <div class="uk-width-1-3">
+                    <div class="uk-width-1-4">
                         <div class="uk-panel uk-panel-box">
                             <div class="uk-panel-title"><h1><?php print $value['dayofweek']; ?> <?php print $value['dayofmonth'];?></h1></div>
                         </div>
@@ -43,21 +43,19 @@
                                     $forecast = $forecasts[$area];
                                     $name = $forecast['area'];
                                     $warning = $forecast['warning'];
-                                    $now = $forecast['forecast'][0];
-                                    if (isset($forecast['forecast'][1])) {
-                                        $outlook = $forecast['forecast'][1];
-                                    }
                                     print '<div class="uk-panel-title">'.$name.'</div><div class="uk-panel-body">';
                                     if (strlen($warning)>0) {
                                         print '<div class="uk-alert-danger"><h3>' . $warning . '</h3></div>';
                                     }
-                                    print '<h3>Forecast</h3>';
-                                    foreach ($now as $key=>$info){
-                                        print '<div><strong>'.$key.'</strong></div><div>'.$info.'</div>';
+                                    if (isset($forecast['forecast'])) {
+                                        print '<h3>Forecast</h3>';
+                                        foreach ($forecast['forecast'] as $key=>$info){
+                                            print '<div><strong>'.$key.'</strong></div><div>'.$info.'</div>';
+                                        }
                                     }
-                                    if (count($outlook)>0) {
+                                    if (isset($forecast['outlook'])) {
                                         print '<div class="uk-margin-top"><h3>Outlook</h3></div>';
-                                        foreach ($outlook as $key=>$info){
+                                        foreach ($forecast['outlook'] as $key=>$info){
                                             print '<div><strong>'.$key.'</strong></div><div>'.$info.'</div>';
                                         }
                                     }
@@ -82,26 +80,67 @@
 
 
                     </div>
-                    <div class="uk-width-1-3">
+                    <div class="uk-width-1-2">
                         <table class="uk-table">
 
+                            <?php $displayTime = false; ?>
                             <?php foreach($value['times'] as $event=>$data):?>
+                                <?php
+                                    $display = true;
+                                    if (strpos($event,'sunrise')) {
+                                        $displayTime = true;
+                                    }
+                                    if (!strpos($event,'conwy')) {
+                                        $display = false;
+                                    }
+                                    if (strpos($event, 'moon')) {
+                                        $display = false;
+                                    }
+                                    if (strpos($event, 'gateopen')) {
+                                        $boldTime = true;
+                                    }
+                                ?>
+
                                 <?php if (strpos($event,'conwy')): ?>
-                                    <tr>
-                                        <td><?php print $data['time']?></td>
-                                        <td><?php print $data['type']?></td>
-                                        <td><?php print $data['depth']?> <?php print $data['D']?> <?php print $data['S']?> <?php print $data['G']?></td>
-                                    </tr>
+                                    <?php if ($displayTime==true && $display==true): ?>
+                                        <tr>
+                                            <?php if ($boldTime): ?>
+                                                <td class="uk-text-bold"><?php print $data['time']?></td>
+                                            <?php else: ?>
+                                                <td><?php print $data['time']?></td>
+                                            <?php endif; ?>
+                                            <td><?php
+                                                switch ($data['type']) {
+                                                    case 'hightide': print 'High tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
+                                                    case 'lowtide' : print 'Low tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
+                                                    case 'sunset': print 'Sun set'; break;
+                                                    case 'sunrise': print 'Sun rise'; break;
+                                                    case 'gateopen': print '<strong>Gate open</strong>'; break;
+                                                    case 'gateclose': print '<strong>Gate close</strong>'; break;
+                                                    case 'datapoint': print 'Wind direction: <strong>'.$data['D'].'</strong> speed: <strong>'.$data['S'].'mph</strong> ('.$data['G'].'mph max)';break;
+                                                    default:
+                                                        print $data['type'];
+                                                } ?></td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endif; ?>
+                                <?php
+                                    if (strpos($event,'sunset')) {
+                                        $displayTime = false;
+                                    }
+                                    if (strpos($event, 'gateclose')){
+                                        $boldTime = false;
+                                    }
+                                ?>
                             <?php endforeach; ?>
                         </table>
                     </div>
-                    <div class="uk-width-1-3">
-                        <div class="uk-grid uk-grid-colapse">
+                    <div class="uk-width-1-4">
+                        <div class="uk-grid">
                             <?php foreach($value['times'] as $event=>$data):?>
                                 <?php if (strpos($event,'pressure')): ?>
                                     <?php if (strpos($event,'colour')): ?>
-                                        <div class="uk-width-1-1"><?php print '<img src="/data/forecast/'.$current_date.'/'.$event.'"/>'; ?></div>
+                                        <div class="uk-width-1-1 uk-margin-bottom"><?php print '<img src="/data/forecast/'.$current_date.'/'.$event.'"/>'; ?></div>
                                     <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>

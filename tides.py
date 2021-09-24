@@ -170,7 +170,7 @@ def get_gatetimes(location, date, tides):
                 gateclose = hightide + timedelta(hours=+3)
                 date_url = gateclose.strftime("%Y%m%d")
                 time = gateclose.strftime("%H:%M")
-                type = 'gateopen'
+                type = 'gateclose'
                 json = {
                     'time': time,
                     'type': type

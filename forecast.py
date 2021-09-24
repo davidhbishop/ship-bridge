@@ -1,5 +1,3 @@
-import array
-
 import bs4.element
 import requests
 import os
@@ -9,6 +7,8 @@ from tqdm import tqdm
 from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse
 from datetime import datetime
+from datetime import timedelta
+from config import check_folder
 
 def is_valid(url):
     """
@@ -248,16 +248,44 @@ def download_file(pathname, filename, url):
 
 def save(forecasts):
     now = datetime.now()
-    date = now.strftime("%Y%m%d")
-    area = 0;
+    today_date = now.strftime("%Y%m%d")
+    area = 0
+
+    tomorrow_time = now + timedelta(days=1)
+    tomorrow_date = tomorrow_time.strftime("%Y%m%d")
 
     for forecast in forecasts:
         if (area > 0):
-            pathname = 'data/forecast/' + date
+            today = {
+                "area": forecast['area'],
+                "warning": forecast['warning'],
+                "forecast": forecast['forecast'][0]
+            }
+
+            tomorrow = {
+                "area": forecast['area'],
+                "warning": forecast['warning']
+            }
+            if len(forecast['forecast'])==2:
+                tomorrow['outlook'] = forecast['forecast'][1]
+
+            pathname = 'data/forecast/' + today_date
+            check_folder(today_date)
             filename = pathname + '/0000-inshore-area-' + str(area) + '.json'
+            print(filename)
             with open(filename, 'w') as outfile:
-                json.dump(forecast, outfile)
+                json.dump(today, outfile)
+
+            pathname2 = 'data/forecast/' + tomorrow_date
+            check_folder(tomorrow_date)
+            filename2 = pathname2 + '/0000-inshore-area-' + str(area) + '.json'
+            print(filename2)
+            with open(filename2, 'w') as outfile2:
+                json.dump(tomorrow, outfile2)
+
         area = area + 1;
+
+
 
 def process_forecast():
     pressure = "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure"
