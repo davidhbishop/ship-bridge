@@ -3,6 +3,10 @@
 $days = array();
 $current_day = date_create();
 $today_date = date_format($current_day, "Ymd");
+$target_date = $_GET['date'];
+if (!$target_date) {
+    $target_date = $today_date;
+}
 
 for ($x = 0; $x < 7; $x++) {
     $day = array();
@@ -42,13 +46,6 @@ for ($x = 0; $x < 7; $x++) {
 	$forward = $page+1;
 	$back = $page-1;
 
-	//Load JSON file
-	$filename = "navigation/data.json";
-	$strJsonFileContents = file_get_contents($filename);
-	$forecasts = json_decode($strJsonFileContents,true);
-	$situation = $forecasts[0]['general'];
-	$stamp = $forecasts[0]['stamp'];
-
     ?>
 
 <?php include 'template/header.php'; ?>
@@ -58,20 +55,4 @@ for ($x = 0; $x < 7; $x++) {
         <?php include 'template/table.php' ?>
     <?php endif; ?>
 
-	<?php if ($display=="bw") {
-			print '<img class="uk-width-1-1" src="navigation/chartBW'.$page.'.gif" alt="">';
-		}?>
-	<?php if ($display=="colour") {
-			print '<img class="uk-width-1-1" src="navigation/chartColour'.$page.'.gif" alt="">';
-		}?>
-
-    <?php if ($display=="forecast") : ?>
-
-
-
-    <?php endif;  ?>
-
-
- </body>
-
-</html>
+<?php include 'template/footer.php' ?>

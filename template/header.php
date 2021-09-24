@@ -7,6 +7,7 @@
     </style>
 </head>
 <body>
+<?php /*
   		<nav class="uk-navbar">
 			<div class="uk-navbar-content">
 				<div class="uk-button-group">
@@ -34,9 +35,9 @@
                     print '</div></div>';
 				} else {
                     print '<div class="uk-navbar-content uk-navbar-flip"><div class="uk-button-group">/';
-                    print '<a class="uk-button uk-button-primary" href="/?page=0&display=forecast">List</a></li>';
+                    print '<a class="uk-button uk-button-primary" href="/?display=dashboard">List</a></li>';
                     print '</div></div>';
                 }
 
 			?>
-  		</nav>
+  		</nav>*/ ?>
