@@ -14,6 +14,6 @@
   },
   {
     "type": "weather",
-    "url": "https://www.metoffice.gov.uk/weather/forecast/LOCATION"
+    "url": "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/LOCATION?res=3hourly&key=a1087614-9404-4ffd-b995-32deb2b8b92d"
   }
 ]

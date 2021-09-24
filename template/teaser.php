@@ -31,10 +31,12 @@
                         <table>
                             <?php foreach($value['times'] as $event=>$data):?>
                                 <?php if (strpos($event,'tide')): ?>
-                                    <tr>
-                                        <td class="uk-text-small"><?php print $data['time']?></td>
-                                        <td class="uk-text-small"><?php print $data['depth']?></td>
-                                    </tr>
+                                    <?php if (strpos($event,'conwy')): ?>
+                                        <tr>
+                                            <td class="uk-text-small"><?php print $data['time']?></td>
+                                            <td class="uk-text-small"><?php print $data['depth']?></td>
+                                        </tr>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             <?php endforeach; ?>
                         </table>

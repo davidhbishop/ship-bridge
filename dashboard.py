@@ -5,7 +5,7 @@ from weather import process_weather
 def main():
     process_tides()
     process_forecast()
-#    process_weather()
+    process_weather()
 
 if __name__ == "__main__":
     main()

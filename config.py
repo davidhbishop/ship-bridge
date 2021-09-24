@@ -39,3 +39,11 @@ def check_folder(date_url):
     if not os.path.isdir(pathname):
         os.makedirs(pathname)
     return pathname
+
+def write_data(date_url, location_name, time, content_type, data):
+    pathname = check_folder(date_url)
+    time_url = time[:2] + time[3:5]
+    filename = pathname + '/' + time_url + '-' + location_name.lower() + '-' + content_type.lower() + '.json'
+    print(filename)
+    with open(filename, 'w') as outfile:
+        json.dump(data, outfile)

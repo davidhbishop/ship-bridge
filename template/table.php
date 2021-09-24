@@ -23,19 +23,27 @@
                         <div><h1><?php print $value['dayofmonth'];?></h1></div>
                         <div><h2><?php print $value['dayofweek']; ?></h2></div>
                     </div>
-                    <div class="uk-width-5-6">
+                    <div class="uk-width-5-6"> (mph)
                         <table class="uk-table">
                             <thead>
                                 <th>Time</th>
-                                <th>Depth</th>
                                 <th>Type</th>
+                                <th>Depth</th>
+                                <th>Direction</th>
+                                <th>Speed</th>
+                                <th>Gusts</th>
                             </thead>
                             <?php foreach($value['times'] as $event=>$data):?>
+                                <?php if (strpos($event,'conwy')): ?>
                                     <tr>
                                         <td><?php print $data['time']?></td>
-                                        <td><?php print $data['depth']?></td>
                                         <td><?php print $data['type']?></td>
+                                        <td><?php print $data['depth']?></td>
+                                        <td><?php print $data['D']?></td>
+                                        <td><?php print $data['S']?></td>
+                                        <td><?php print $data['G']?></td>
                                     </tr>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </table>
                     </div>

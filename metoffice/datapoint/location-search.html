@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Location search example</title>
+</head>
+<body>
+<h1>Location search example</h1>
+<p>Finds the closest observation stations to your location</p>
+<form>
+	<ul>
+		<li>
+			<label for="lat">Latitude</label>
+			,
+			<label for="lon">longitude</label>
+			<input name="lat" id="lat" type="text">
+			,
+			<input name="lon" id="lon" type="text">
+			or
+			<button id="geolocate" type="button">Find my location</button>
+		</li>
+		<li>
+			<button id="searchLocations" type="button">Find closest sites</button>
+		</li>
+	</ul>
+</form>
+<h2>Closest site</h2>
+<div id="closest"></div>
+<h2>Nearby sites</h2>
+<div id="nearby"></div>
+<script src="jquery-1.10.0.min.js"></script> 
+<script src="find-locations.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+
+    $('#geolocate').click(function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(geoSuccess, geoError)
+        } else {
+            alert("Browser does not support geolocation");
+        }
+    });
+
+    $('#searchLocations').click(function() {
+        $.getJSON('sitelist.json', function(data) {
+            var closest, locations, nearby, output = [],
+                standpoint, i;
+				
+			// parse the sitelist.json data into an array of Location objects
+            locations = parseJSON(data);
+			
+			// where you are
+            standpoint = new Location(null, "Your location", document.getElementById('lat').value, document.getElementById('lon').value);
+			
+			// just interested in the closest location in the list
+            closest = getNearest(standpoint, locations);
+            
+			// or perhaps the 5 closest
+            nearby = getNNearest(standpoint, locations, 5);
+            
+			// output the results
+            for (i = 0; i < nearby.length; i++) {
+                output.push(nearby[i].location.name + ' (' + Number(nearby[i].dist).toPrecision(2) + ' km away)');
+            }
+			// Name and ID
+            document.getElementById('closest').innerHTML = [closest.location.name, ' (', closest.location.id, ')'].join('');
+			// Name and distance
+            document.getElementById('nearby').innerHTML = ['<ol><li>', output.join('<\/li><li>'), '<\/li><\/ol>'].join('');
+        }).fail(function(jqxhr, textStatus, error) {
+
+            alert("Request Failed: " + textStatus + ', ' + error);
+        });
+    });
+
+    function geoSuccess(position) {
+        document.getElementById('lat').value = position.coords.latitude;
+        document.getElementById('lon').value = position.coords.longitude;
+    }
+
+    function geoError(error) {
+        switch (error.code) {
+        case error.PERMISSION_DENIED:
+            alert("Geolocate PERMISSION_DENIED: " + error.message);
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Geolocate POSITION_UNAVAILABLE: " + error.message);
+            break;
+        case error.TIMEOUT:
+            alert("Geolocate TIMEOUT: " + error.message);
+            break;
+        default:
+            alert("Geolocate code " + error.code + ': ' + error.message);
+            break;
+        }
+    }
+
+});
+</script>
+</body>
+</html>
