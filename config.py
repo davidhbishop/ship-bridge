@@ -15,7 +15,7 @@ def get_date(target):
 def get_dates():
     dates = []
     now = datetime.now()
-    for i in range(0, 15):
+    for i in range(0, 7):
         target = now + timedelta(days=i)
         date = get_date(target)
         dates.append(date)

@@ -4,14 +4,15 @@
     "type": "home",
     "keys": [
       {
-        "tide": "conwy",
+        "tide-times": "conwy",
+        "admiralty-tidal": "0471A",
         "gate": [
           {
             "open": "-3",
             "close": "+3"
           }
         ],
-        "weather": "351005"
+        "met-office": "351005"
       }
     ]
   },
@@ -20,8 +21,8 @@
     "type": "table",
     "keys": [
       {
-        "tide": "holyhead",
-        "weather": "gckxq8ehx"
+        "tide-times": "holyhead",
+        "met-office": "gckxq8ehx"
       }
     ]
   }

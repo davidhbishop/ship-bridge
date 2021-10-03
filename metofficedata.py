@@ -1,6 +1,3 @@
-import bs4.element
-from bs4 import BeautifulSoup as bs
-import requests
 from urllib.request import urlopen
 import json
 
@@ -9,9 +6,9 @@ from config import get_sources
 from config import write_data
 
 
-def get_weather(weather_source, location):
+def get_metdata(weather_source, location):
     url = weather_source
-    weather_name = location['keys'][0]['weather']
+    weather_name = location['keys'][0]['meteorology']
     url = url.replace('LOCATION',weather_name)
 
     response = urlopen(url)
@@ -41,18 +38,18 @@ def convert_min2hour(minutes):
     return time
 
 
-def process_weather():
+def process_metofficedata():
     locations = get_locations()
     sources = get_sources()
 
-    weather_source = ''
+    metoffice_source = ''
 
     for source in sources:
         if isinstance(source['type'], str):
-            if source['type'] == 'weather':
-                weather_source = source['url']
+            if source['type'] == 'met-office':
+                metoffice_source = source['url']
 
     for location in locations:
         if (location['name']=='Conwy'):
-            get_weather(weather_source, location)
+            get_metdata(metoffice_source, location)
 

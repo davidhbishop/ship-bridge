@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup as bs
 from urllib.parse import urlparse
 from datetime import datetime
 from datetime import timedelta
-from config import check_folder
+from config import check_folder, get_sources
 
 def is_valid(url):
     """
@@ -117,12 +117,17 @@ def get_forecasts(url):
                         sea = data[7].contents[0]
                         weather = data[11].contents[0]
                         visibility = data[15].contents[0]
-                        output = {"wind":wind, "sea":sea, "weather":weather, "visibility":visibility}
+                        output = {
+                            "wind": wind,
+                            "sea": sea,
+                            "weather": weather,
+                            "visibility": visibility
+                        }
                         forecast.append(output)
 
                 forecast_json = {
-                                    "area":area_name,
-                                    "warning":area_warning,
+                                    "area": area_name,
+                                    "warning": area_warning,
                                     "forecast": forecast
                                  }
 
@@ -196,7 +201,7 @@ def download_map(map):
     url = map[0]
     label = map[6]
 
-    pathname = 'data/forecast/' + year + month + day
+    pathname = 'data/forecast/' + str(year) + str(month) + str(day)
     filename = pathname + '/'+ time + '-pressure-map-' + label +'.gif'
 
     download_file(pathname, filename, url)
@@ -287,9 +292,20 @@ def save(forecasts):
 
 
 
-def process_forecast():
-    pressure = "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure"
-    inshore = "https://www.metoffice.gov.uk/weather/specialist-forecasts/coast-and-sea/inshore-waters-forecast"
+def process_metoffice():
+    sources = get_sources()
+    pressure = ""
+    inshore = ""
+
+    for source in sources:
+        if isinstance(source['type'], str):
+            if source['type'] == 'metoffice-pressure':
+                pressure = source['url']
+
+        if isinstance(source['type'], str):
+            if source['type'] == 'metoffice-surface':
+                pressure = source['url']
+
 
     # get all pressure maps
     maps = get_maps(pressure)

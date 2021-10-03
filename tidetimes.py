@@ -11,28 +11,25 @@ from config import get_sources
 from config import get_dates, get_date
 from config import write_data
 
-
-
-
 def get_times(tide_source, date, location):
 
     url = tide_source
-    location_tide_name = location['keys'][0]['tide']
+    location_tide_name = location['keys'][0]['tide-times']
     url = url.replace('LOCATION',location_tide_name)
     url = url.replace('DATE',date['url'])
     soup = bs(requests.get(url).content, "html.parser")
 
-    tides = get_timetable(soup)
-    for tide in tides:
-        write_data(date['url'], location['name'], tide['time'], tide['type'], tide)
+#    tides = get_timetable(soup)
+#    for tide in tides:
+#        write_data(date['url'], location['name'], tide['time'], tide['type'], tide)
 
     universe = get_universe(soup)
     for movement in universe:
         write_data(date['url'], location['name'], movement['time'], movement['type'], movement)
 
-    for key in location['keys'][0]:
-        if key=='gate':
-            gates = get_gatetimes(location, date, tides)
+ #   for key in location['keys'][0]:
+ #       if key=='gate':
+ #            gates = get_gatetimes(location, date, tides)
 
 
 def get_timetable(soup):
@@ -179,7 +176,7 @@ def get_gatetimes(location, date, tides):
 
 
 
-def process_tides():
+def process_times():
     dates = get_dates()
     locations = get_locations()
     sources = get_sources()
