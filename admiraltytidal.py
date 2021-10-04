@@ -1,5 +1,7 @@
 import requests
 import json
+from datetime import datetime
+from datetime import timedelta
 
 from config import get_locations
 from config import get_sources
@@ -8,6 +10,14 @@ from config import write_data
 def get_tidal(tidal_source, location):
     url = tidal_source
     tidal_name = location['keys'][0]['admiralty-tidal']
+    open_diff = ''
+    close_diff = ''
+
+    for key in location['keys'][0]:
+        if key=='gate':
+            open_diff = location['keys'][0]['gate'][0]['open']
+            close_diff = location['keys'][0]['gate'][0]['close']
+
     url = url.replace('LOCATION',tidal_name)
 
     url = tidal_source.replace('LOCATION', tidal_name)
@@ -34,6 +44,32 @@ def get_tidal(tidal_source, location):
             }
 
         write_data(date_folder, location['name'], time, event_type, event_data)
+        if (event_type=='HighWater'):
+            hour = date[11:13]
+            minute = date[14:16]
+            hightide = datetime(int(year), int(month), int(day), int(hour), int(minute), 0)
+
+            if open_diff == '-3':
+                gateopen = hightide + timedelta(hours=-3)
+                date_url = gateopen.strftime("%Y%m%d")
+                opentime = gateopen.strftime("%H:%M")
+                type = 'gateopen'
+                opendata = {
+                    'time': time,
+                    'type': type
+                }
+                write_data(date_url, location['name'], opentime, 'gateopen', opendata)
+
+            if close_diff == '+3':
+                gateclose = hightide + timedelta(hours=+3)
+                date_url = gateclose.strftime("%Y%m%d")
+                closetime = gateclose.strftime("%H:%M")
+                type = 'gateclose'
+                closedata = {
+                    'time': time,
+                    'type': type
+                }
+                write_data(date_url, location['name'], closetime, 'gateclose', closedata)
 
 
 def process_tidal():
