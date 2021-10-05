@@ -6,6 +6,7 @@ from datetime import timedelta
 from config import get_locations
 from config import get_sources
 from config import write_data
+from config import get_summer
 
 def get_tidal(tidal_source, location):
     url = tidal_source
@@ -18,8 +19,6 @@ def get_tidal(tidal_source, location):
             open_diff = location['keys'][0]['gate'][0]['open']
             close_diff = location['keys'][0]['gate'][0]['close']
 
-    url = url.replace('LOCATION',tidal_name)
-
     url = tidal_source.replace('LOCATION', tidal_name)
 
     session = requests.session()
@@ -31,9 +30,23 @@ def get_tidal(tidal_source, location):
         year = date[0:4]
         month = date[5:7]
         day = date[8:10]
+        hour = date[11:13]
+        minute = date[14:16]
 
-        time = date[11:16]
-        date_folder = str(year) + str(month) + str(day)
+        #Convert from UTC to British Summer Time (if needed)
+        tidetime_utc = datetime(int(year), int(month), int(day), int(hour), int(minute), 0)
+        utc_timestamp = datetime.timestamp(tidetime_utc)
+        utc_year = tidetime_utc.strftime("%Y")
+        summer = get_summer(utc_timestamp, utc_year)
+
+        if summer == 'summer':
+            tidetime = tidetime_utc + timedelta(hours=+1)
+        else:
+            tidetime = tidetime
+
+        #Corrected
+        date_folder = tidetime.strftime("%Y%m%d")
+        time = tidetime.strftime("%H:%M")
 
         event_type = tide_event['EventType']
         height = round(tide_event['Height'],2)
@@ -45,12 +58,9 @@ def get_tidal(tidal_source, location):
 
         write_data(date_folder, location['name'], time, event_type, event_data)
         if (event_type=='HighWater'):
-            hour = date[11:13]
-            minute = date[14:16]
-            hightide = datetime(int(year), int(month), int(day), int(hour), int(minute), 0)
 
             if open_diff == '-3':
-                gateopen = hightide + timedelta(hours=-3)
+                gateopen = tidetime + timedelta(hours=-3)
                 date_url = gateopen.strftime("%Y%m%d")
                 opentime = gateopen.strftime("%H:%M")
                 type = 'gateopen'
@@ -61,7 +71,7 @@ def get_tidal(tidal_source, location):
                 write_data(date_url, location['name'], opentime, 'gateopen', opendata)
 
             if close_diff == '+3':
-                gateclose = hightide + timedelta(hours=+3)
+                gateclose = tidetime + timedelta(hours=+3)
                 date_url = gateclose.strftime("%Y%m%d")
                 closetime = gateclose.strftime("%H:%M")
                 type = 'gateclose'

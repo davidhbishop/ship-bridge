@@ -30,7 +30,7 @@
                                 $forecasts = array();
 
                                 foreach($value['times'] as $event=>$data) {
-				    print '<p>'.$event.'</p>';
+				                    #print '<p>'.$event.'</p>';
                                     if (strpos($event,'inshore')) {
                                         $index = substr($event,18);
                                         $index = substr($index, 0,strlen($index)-5);
@@ -110,8 +110,8 @@
                                             <?php endif; ?>
                                             <td><?php
                                                 switch ($data['type']) {
-                                                    case 'hightide': print 'High tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
-                                                    case 'lowtide' : print 'Low tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
+                                                    case 'HighWater': print 'High tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
+                                                    case 'LowWater' : print 'Low tide at a depth of <strong>'.$data['depth'].'</strong>'; break;
                                                     case 'sunset': print 'Sun set'; break;
                                                     case 'sunrise': print 'Sun rise'; break;
                                                     case 'gateopen': print '<strong>Gate open</strong>'; break;
