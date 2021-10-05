@@ -201,7 +201,7 @@ def download_map(map):
     url = map[0]
     label = map[6]
 
-    pathname = 'data/forecast/' + str(year) + str(month) + str(day)
+    pathname = 'data/forecast/' + str(year) + str(month).zfill(2) + str(day).zfill(2)
     filename = pathname + '/'+ time + '-pressure-map-' + label +'.gif'
 
     download_file(pathname, filename, url)
@@ -303,8 +303,8 @@ def process_metoffice():
                 pressure = source['url']
 
         if isinstance(source['type'], str):
-            if source['type'] == 'metoffice-surface':
-                pressure = source['url']
+            if source['type'] == 'metoffice-inshore':
+                inshore = source['url']
 
 
     # get all pressure maps

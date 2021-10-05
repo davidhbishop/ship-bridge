@@ -4,10 +4,10 @@ from metofficedata import process_metofficedata
 from admiraltytidal import process_tidal
 
 def main():
-    process_tidal()
+#    process_tidal()
 #    process_times()
 #    process_metoffice()
-#    process_metofficedata()
+    process_metofficedata()
 
 if __name__ == "__main__":
     main()

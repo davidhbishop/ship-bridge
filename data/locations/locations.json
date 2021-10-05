@@ -12,7 +12,7 @@
             "close": "+3"
           }
         ],
-        "met-office": "351005"
+        "metoffice-data": "351005"
       }
     ]
   },
@@ -22,7 +22,7 @@
     "keys": [
       {
         "tide-times": "holyhead",
-        "met-office": "gckxq8ehx"
+        "metoffice-data": "gckxq8ehx"
       }
     ]
   }

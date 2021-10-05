@@ -8,7 +8,7 @@ from config import write_data
 
 def get_metdata(weather_source, location):
     url = weather_source
-    weather_name = location['keys'][0]['meteorology']
+    weather_name = location['keys'][0]['metoffice-data']
     url = url.replace('LOCATION',weather_name)
 
     response = urlopen(url)
@@ -46,7 +46,7 @@ def process_metofficedata():
 
     for source in sources:
         if isinstance(source['type'], str):
-            if source['type'] == 'met-office':
+            if source['type'] == 'metoffice-data':
                 metoffice_source = source['url']
 
     for location in locations:
