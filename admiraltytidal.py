@@ -65,7 +65,7 @@ def get_tidal(tidal_source, location):
                 opentime = gateopen.strftime("%H:%M")
                 type = 'gateopen'
                 opendata = {
-                    'time': time,
+                    'time': opentime,
                     'type': type
                 }
                 write_data(date_url, location['name'], opentime, 'gateopen', opendata)
@@ -76,7 +76,7 @@ def get_tidal(tidal_source, location):
                 closetime = gateclose.strftime("%H:%M")
                 type = 'gateclose'
                 closedata = {
-                    'time': time,
+                    'time': closetime,
                     'type': type
                 }
                 write_data(date_url, location['name'], closetime, 'gateclose', closedata)
