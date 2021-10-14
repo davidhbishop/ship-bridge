@@ -38,7 +38,7 @@
                         <div class="uk-width-3-4">
                             <table>
                                 <?php foreach($value['times'] as $event=>$data):?>
-                                    <?php if (strpos($event,'tide')): ?>
+                                    <?php if (strpos($event,'highwater')): ?>
                                         <?php if (strpos($event,'conwy')): ?>
                                             <tr>
                                                 <td class="uk-text-small"><?php print $data['time']?></td>
@@ -50,8 +50,8 @@
                             </table>
                         </div>
                     </div>
-                </div>
                 <?php print '</a>'; ?>
+                </div>
             </div>
         <?php endif; ?>
     <?php endforeach; ?>

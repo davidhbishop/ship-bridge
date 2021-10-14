@@ -54,5 +54,5 @@ for ($x = 0; $x < 7; $x++) {
     <?php if ($display=="dashboard") :?>
         <?php include 'template/table.php' ?>
     <?php endif; ?>
-
+<?php include 'template/pressure-maps.php'?>
 <?php include 'template/footer.php' ?>

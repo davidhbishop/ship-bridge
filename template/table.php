@@ -134,21 +134,6 @@
                             <?php endforeach; ?>
                         </table>
                     </div>
-                    <div class="uk-width-medium-1-4 uk-width-small-1-1">
-                        <div class="uk-grid">
-                            <?php foreach($value['times'] as $event=>$data):?>
-                                <?php if (strpos($event,'pressure')): ?>
-                                    <?php if (strpos($event,'colour')): ?>
-                                        <div class="uk-width-1-1 uk-margin-bottom"><?php print '<img src="/data/forecast/'.$current_date.'/'.$event.'"/>'; ?></div>
-                                    <?php endif; ?>
-                                <?php endif; ?>
-                            <?php endforeach; ?>
-
-
-
-
-                        </div>
-                    </div>
         <?php endif; ?>
     <?php endforeach; ?>
 
