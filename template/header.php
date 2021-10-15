@@ -8,8 +8,3 @@
     <script src="/js/jquery.js"></script>
     <script src="/js/uikit.js"></script>
     <script src="/js/components/slideshow.js"></script>
-    <style>
-        body {
-            background: darkgrey;
-        }
-    </style>

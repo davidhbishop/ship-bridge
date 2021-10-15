@@ -26,6 +26,10 @@ def get_metdata(weather_source, location):
             time_file = convert_min2hour(time)
             datapoint['type'] = 'datapoint'
             datapoint['time'] = time_file
+            windGust = float(datapoint['G'])
+            windSpeed = float(datapoint['S'])
+            datapoint['G'] = str(round(windGust * 0.868976)) #Convert to knots
+            datapoint['S'] = str(round(windSpeed * 0.868976)) #Convert to knots
             write_data(date_folder, location['name'], time_file, 'datapoints', datapoint)
 
 

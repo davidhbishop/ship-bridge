@@ -116,7 +116,7 @@
                                                     case 'sunrise': print 'Sun rise'; break;
                                                     case 'gateopen': print '<strong>Gate open</strong>'; break;
                                                     case 'gateclose': print '<strong>Gate close</strong>'; break;
-                                                    case 'datapoint': print 'Wind direction: <strong>'.$data['D'].'</strong> speed: <strong>'.$data['S'].'mph</strong> ('.$data['G'].'mph max)';break;
+                                                    case 'datapoint': print 'Wind direction: <strong>'.$data['D'].'</strong> speed: <strong>'.$data['S'].'Knots</strong> ('.$data['G'].'mph max)';break;
                                                     default:
                                                         print $data['type'];
                                                 } ?></td>
