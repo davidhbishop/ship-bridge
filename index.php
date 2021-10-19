@@ -49,10 +49,5 @@ for ($x = 0; $x < 7; $x++) {
     ?>
 
 <?php include 'template/header.php'; ?>
-<?php include 'template/teaser.php' ?>
-
-    <?php if ($display=="dashboard") :?>
-        <?php include 'template/table.php' ?>
-    <?php endif; ?>
-<?php include 'template/pressure-maps.php'?>
+<?php include 'template/widgets.php'; ?>
 <?php include 'template/footer.php' ?>

@@ -12,6 +12,12 @@
             "close": "+3"
           }
         ],
+        "tide-range": [
+          {
+            "lowest": "-0.1",
+            "highest": "9.3"
+          }
+        ],
         "metoffice-data": "351005"
       }
     ]

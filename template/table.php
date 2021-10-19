@@ -19,66 +19,6 @@
         ?>
 
         <?php if ($use): ?>
-                    <div class="uk-width-medium-1-4 uk-width-small-1-1">
-			<div class="uk-margin-left">
-                            <h1><?php print $value['dayofweek']; ?> <?php print $value['dayofmonth'];?></h1>
-			    <p class='uk-text-bold'>Conwy, wales</p>
-
-                        
-                                <?php
-
-                                $forecasts = array();
-
-                                foreach($value['times'] as $event=>$data) {
-				                    #print '<p>'.$event.'</p>';
-                                    if (strpos($event,'inshore')) {
-                                        $index = substr($event,18);
-                                        $index = substr($index, 0,strlen($index)-5);
-                                        $forecasts[$index] = $data;
-                                    }
-                                }
-
-                                $area = $_GET['area'];
-
-                                if ($area > 0) {
-                                    $forecast = $forecasts[$area];
-                                    $name = $forecast['area'];
-                                    $warning = $forecast['warning'];
-                                    print '<p>'.$name.'</p>';
-                                    if (strlen($warning)>0) {
-                                        print '<div class="uk-alert-danger">' . $warning . '</div>';
-                                    }
-                                    if (isset($forecast['forecast'])) {
-                                        print '<table class="uk-table uk-table-striped">';
-                                        foreach ($forecast['forecast'] as $key=>$info){
-                                            print '<tr><th>'.$key.'</th><td>'.$info.'</td></tr>';
-                                        }
-					print '</table>';
-                                    }
-                                    if (isset($forecast['outlook'])) {
-                                        print '<table class="uk-table uk-table-striped">';
-                                        foreach ($forecast['outlook'] as $key=>$info){
-                                            print '<tr><th>'.$key.'</th><td>'.$info.'</td></tr>';
-                                        }
-                                    }
-				    print '</table>';
-
-				    print '<a href="?display=dashboard&date='.$current_date.'">Back</a>';
-                                } else {
-                                    print "<table class='uk-table uk-table-striped'>";
-
-                                    foreach ($forecasts as $area=>$forecast) {
-                                        if ($area > 9 && $area < 13) {
-                                            print '<tr><td><a href="?display=dashboard&area='.trim($area).'&date='.$current_date.'">'.$forecast["area"].'</a></td></tr>';
-                                        }
-                                    }
-
-                                    print "</table>";
-                                }
-
-                                ?>
-			</div>
-                    </div>
                     <div class="uk-width-medium-1-2 uk-width-small-1-1">
                         <table class="uk-table uk-table-striped">
 
@@ -116,7 +56,7 @@
                                                     case 'sunrise': print 'Sun rise'; break;
                                                     case 'gateopen': print '<strong>Gate open</strong>'; break;
                                                     case 'gateclose': print '<strong>Gate close</strong>'; break;
-                                                    case 'datapoint': print 'Wind direction: <strong>'.$data['D'].'</strong> speed: <strong>'.$data['S'].'Knots</strong> ('.$data['G'].'mph max)';break;
+                                                    case 'datapoint': print 'Wind direction: <strong>'.$data['D'].'</strong> speed: <strong>'.$data['S'].' knots</strong> ('.$data['G'].'knots max)';break;
                                                     default:
                                                         print $data['type'];
                                                 } ?></td>

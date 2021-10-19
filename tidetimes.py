@@ -94,7 +94,7 @@ def get_universe(soup):
                 if index==4:
                     for img in row.find_all('img'):
                         moon_graphic = img['src']
-                        #moon['graphic'] = str(moon_graphic)
+                        moon['graphic'] = str(moon_graphic)
 
                 if index==5:
                     for rise in row.find_next('span'):
@@ -114,7 +114,7 @@ def get_universe(soup):
 
                 if index==7:
                     moon_phase = str(row.contents[1])
-                    #moon['phase'] = moon_phase
+                    moon['phase'] = moon_phase
 
 
     universe.append(moon)
