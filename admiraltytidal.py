@@ -42,7 +42,7 @@ def get_tidal(tidal_source, location):
         if summer == 'summer':
             tidetime = tidetime_utc + timedelta(hours=+1)
         else:
-            tidetime = tidetime
+            tidetime = tidetime_utc
 
         #Corrected
         date_folder = tidetime.strftime("%Y%m%d")
