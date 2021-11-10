@@ -11,7 +11,7 @@ import json
 SK_CLIENT = None
 STDSCR = None
 
-def process_signalk():
+def process_boatdata():
     """main"""
 
     from signalk.client import Client
@@ -92,7 +92,7 @@ def process_signalk():
 
 
 def main():
-    process_signalk()
+    process_boatdata()
 
 
 if __name__ == "__main__":
