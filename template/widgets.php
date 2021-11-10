@@ -19,5 +19,6 @@
     <?php include 'widget-forecast.php'?>
     <?php include 'widget-tidal.php'?>
     <?php include 'widget-weather.php'?>
-</div>
+    <?php include 'widget-sense.php'?>
+    </div>
 <?php include 'pressure-maps.php'?>
