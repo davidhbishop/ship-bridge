@@ -1,22 +1,35 @@
 import json
+import os
+from datetime import datetime
 from sense_hat import SenseHat
+sense = SenseHat()
 
-from config import write_data
-from config import get_dates
+humidity = sense.humidity
+temperature = sense.temperature
+pressure = sense.get_pressure()
 
-def process_sensehat():
-    sense = SenseHat()
-    dates = get_dates()
+humidity = round(humidity,2)
+temperature = round(temperature, 2)
+pressure = round(pressure, 2)
 
-    humidity = sense.humidity
-    temperature = sense.temperature
-    pressure = sense.pressure
+now = datetime.now()
+date_folder = now.strftime("%Y%m%d")
+time_string = now.strftime("%H%M")
 
-    data = {
-        "humidity": humidity,
-        "temperature": temperature,
-        "pressure": pressure
-    }
+pathname = 'data/forecast/' + date_folder
+filename = pathname + '/' + time_string + '-sensehat.json'
 
-    pathname = '/data/forecast/' + dates[0]['url']
-    filename = pathname + '/' + time + '-sensehat.json'
+data = {
+    "humidity": humidity,
+    "temperature": temperature,
+    "pressure": pressure
+}
+
+print(filename)
+print(data)
+
+if not os.path.isdir(pathname):
+    os.makedirs(pathname)
+
+with open(filename, 'w') as outfile:
+    json.dump(data, outfile)
