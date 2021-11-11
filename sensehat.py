@@ -4,9 +4,9 @@ from datetime import datetime
 from sense_hat import SenseHat
 sense = SenseHat()
 
-humidity = sense.humidity
-temperature = sense.temperature
+temperature = sense.get_temperature()
 pressure = sense.get_pressure()
+humidity = sense.humidity
 
 humidity = round(humidity,2)
 temperature = round(temperature, 2)

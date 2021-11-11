@@ -2,8 +2,10 @@ from signalk.client import Client
 import math
 from datetime import datetime
 import time
-"""from sense_hat import SenseHat
-sense = SenseHat()"""
+from sense_hat import SenseHat
+
+sense = SenseHat()
+sense.low_light = True
 
 def convertradtodeg(rad):
     return round(180 * rad / math.pi)
@@ -33,26 +35,25 @@ def render(data, currentCycle):
     keys = data.keys()
     red = (255, 0, 0)
     yellow = (255, 255, 0)
-    for x in range(8, 1, -1):
-        for y in range(1, 9):
+    for x in range(7, 0, -1):
+        for y in range(0, 8):
             w = x - 1
-            """colour = sense.get_pixel(w, y)"""
-            colour = 'yesterday'
+            colour = sense.get_pixel(w, y)
             print(str(x) + ',' + str(y) + "," + str(colour))
-            """sense.set_pixel(x, y, colour)"""
+            sense.set_pixel(x, y, colour)
 
-    for y in range(1, 9):
+    for y in range(0, 8):
         previousCycle = 0
 
         if currentCycle < 8:
             previousCycle = currentCycle + 1
 
         if currentCycle == 8:
-            previousCycle = 0
+            previousCycle = 1
 
         if previousCycle in keys:
-            previousData = data[previousCycle]
-            currentData = data[currentCycle]
+            previousData = data[previousCycle][y]
+            currentData = data[currentCycle][y]
 
             if previousData == currentData:
                 colour = yellow
@@ -61,21 +62,21 @@ def render(data, currentCycle):
                 colour = red
 
             print(str(1) + ',' + str(y) + "," + str(colour))
-            """sense.set_pixel(1, y, colour)"""
+            sense.set_pixel(0, y, colour)
 
         if previousCycle not in keys:
-            print(str(1) + ',' + str(y) + ",red")
-            """sense.set_pixel(1, y, colour)"""
-
+            print(str(1) + ',' + str(y) + "," + str(colour))
+            sense.set_pixel(0, y, (0,0,255))
 
 
 def ticker():
     data = {}
     for i in range(1, 10):
-        for cycle in range(1, 8):
+        for cycle in range(1, 9):
             data[cycle] = getsignalkdata()
+            print(data)
             render(data, cycle)
-            time.sleep(10)
+            time.sleep(0.5)
 
 
 def main():
