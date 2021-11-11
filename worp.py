@@ -33,15 +33,15 @@ def render(data, currentCycle):
     keys = data.keys()
     red = (255, 0, 0)
     yellow = (255, 255, 0)
-    for x in range(8, 2, -1):
-        for y in range(1, 8):
+    for x in range(8, 1, -1):
+        for y in range(1, 9):
             w = x - 1
             """colour = sense.get_pixel(w, y)"""
             colour = 'yesterday'
             print(str(x) + ',' + str(y) + "," + str(colour))
             """sense.set_pixel(x, y, colour)"""
 
-    for y in range(1, 8):
+    for y in range(1, 9):
         previousCycle = 0
 
         if currentCycle < 8:
@@ -50,17 +50,23 @@ def render(data, currentCycle):
         if currentCycle == 8:
             previousCycle = 0
 
-        previousData = data[previousCycle]
-        currentData = data[currentCycle]
+        if previousCycle in keys:
+            previousData = data[previousCycle]
+            currentData = data[currentCycle]
 
-        if previousData == currentData:
-            colour = yellow
+            if previousData == currentData:
+                colour = yellow
 
-        if previousData != currentData:
-            colour = red
+            if previousData != currentData:
+                colour = red
 
-        print(str(1) + ',' + str(y) + "," + str(colour))
-        """sense.set_pixel(1, y, colour)"""
+            print(str(1) + ',' + str(y) + "," + str(colour))
+            """sense.set_pixel(1, y, colour)"""
+
+        if previousCycle not in keys:
+            print(str(1) + ',' + str(y) + ",red")
+            """sense.set_pixel(1, y, colour)"""
+
 
 
 def ticker():
