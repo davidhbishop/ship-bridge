@@ -1,73 +1,29 @@
-"""a signalk client"""
-
-import argparse
 import logging
 from datetime import datetime
 import os
 import sys
 import json
+from signalk.client import Client
+import math
+
 
 # Global Variables
 SK_CLIENT = None
 STDSCR = None
+METERS_PER_NAUTICAL_MILE = 1852
+SECONDS_PER_HOUR = 60*60
 
-def process_boatdata():
-    """main"""
+def save_signalk():
+    signalk_data = {}
 
-    from signalk.client import Client
+    vessel = SK_CLIENT.data.get_vessels()
+    print("Name: " + vessel[0].name)
+    for path in vessel[0].get_targets():
+        datum = vessel[0].get_datum(path)
+        string_path = str(path)
+        string_value = str(datum.value)
 
-    global SK_CLIENT
-
-    argparser = argparse.ArgumentParser(
-        description="SignalK Client"
-        )
-
-    argparser.add_argument(
-        'server',
-        nargs='?',
-        default=None,
-        help='server to connect to',
-        )
-
-    argparser.add_argument(
-        '-L', '--log-level',
-        default="ERROR",
-        help='debug level',
-        )
-
-    argparser.add_argument(
-        '-D', '--log-file',
-        default=None,
-        help='log to file',
-        )
-
-    args = argparser.parse_args()
-
-    # Setup Logging
-    if args.log_file == None:
-        log_stream = sys.stdout
-    else:
-        log_stream = open(args.log_file, "a")
-
-    logging.basicConfig(
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        level=args.log_level,
-        stream=log_stream,
-        )
-
-    SK_CLIENT = Client(args.server)
-
-    signalk_data = {'signalk': 'data'}
-
-    for vessel in sorted(SK_CLIENT.data.get_vessels()):
-        print("Name: " + vessel.name)
-        for path in vessel.get_targets():
-            datum = vessel.get_datum(path)
-            string_path = str(path)
-            string_value = str(datum.value)
-            print(string_path + ": " + string_value)
-
-            signalk_data[string_path] = string_value
+        signalk_data[string_path] = string_value
 
 
     now = datetime.now()
@@ -75,10 +31,9 @@ def process_boatdata():
     time_string = now.strftime("%H%M")
 
     pathname = 'data/forecast/' + date_folder
-    filename = pathname + '/' + time_string + '-signalk.json'
+    filename = pathname + '/' + time_string + '-boat-data.json'
 
     print(filename)
-    print(signalk_data)
 
     if not os.path.isdir(pathname):
         os.makedirs(pathname)
@@ -86,10 +41,63 @@ def process_boatdata():
     with open(filename, 'w') as outfile:
         json.dump(signalk_data, outfile)
 
+
+def convertmeterstoknots(ms):
+    return round(ms * SECONDS_PER_HOUR / METERS_PER_NAUTICAL_MILE)
+
+
+def convertradtodeg(rad):
+    return round(180 * rad / math.pi)
+
+
+def save_log():
+    vessel = SK_CLIENT.data.get_vessels()
+
+    log = {}
+    log['depth'] = vessel[0].get_datum('environment.depth.belowTransducer').value
+
+    log['wind-speed'] = convertmeterstoknots(vessel[0].get_datum('environment.wind.speedTrue').value)
+    log['wind-direction-true'] = convertradtodeg(vessel[0].get_datum('environment.wind.directionTrue').value)
+    log['apparent-wind'] = convertradtodeg(vessel[0].get_datum('environment.wind.angleApparent').value)
+    log['course-over-ground-true'] = convertradtodeg(vessel[0].get_datum('navigation.courseOverGroundTrue').value)
+    log['course-over-ground-magnetic'] = convertradtodeg(vessel[0].get_datum('navigation.courseOverGroundMagnetic').value)
+    log['heading-magnetic'] = convertradtodeg(vessel[0].get_datum('navigation.headingMagnetic').value)
+    log['heading-true'] = convertradtodeg(vessel[0].get_datum('navigation.headingMagnetic').value)
+    log['speed-through-water'] = convertmeterstoknots(vessel[0].get_datum('navigation.speedThroughWater').value)
+    log['speed-over-ground'] = convertmeterstoknots(vessel[0].get_datum('navigation.speedOverGround').value)
+
+    position = vessel[0].get_datum('navigation.position').display_value()
+    cords = position.split(',')
+    lat = cords[0][0:10]
+    long = cords[1][0:10]
+    log['latitude'] = lat
+    log['longitude'] = long
+
+    now = datetime.now()
+    date_folder = now.strftime("%Y%m%d")
+    time_string = now.strftime("%H%M")
+
+    pathname = 'data/forecast/' + date_folder
+    filename = pathname + '/' + time_string + '-boat-log.json'
+
+    print(filename)
+    print(log)
+
+    if not os.path.isdir(pathname):
+        os.makedirs(pathname)
+
+    with open(filename, 'w') as outfile:
+        json.dump(log, outfile)
+
+
+def process_boatdata():
+    global SK_CLIENT
+    SK_CLIENT = Client()
+
+    save_signalk()
+    save_log()
+
     SK_CLIENT.close()
-
-    logging.debug("signalk_client.Data closed...")
-
 
 def main():
     process_boatdata()

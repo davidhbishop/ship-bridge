@@ -20,5 +20,6 @@
     <?php include 'widget-tidal.php'?>
     <?php include 'widget-weather.php'?>
     <?php include 'widget-sense.php'?>
-    </div>
+    <?php include 'widget-log.php'?>
+</div>
 <?php include 'pressure-maps.php'?>
