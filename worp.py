@@ -2,10 +2,11 @@ from signalk.client import Client
 import math
 from datetime import datetime
 import time
-from sense_hat import SenseHat
 
+from sense_hat import SenseHat
 sense = SenseHat()
 sense.low_light = True
+
 
 def convertradtodeg(rad):
     return round(180 * rad / math.pi)
@@ -15,7 +16,6 @@ def getsignalkdata():
     signals = []
     vessel = SK_CLIENT.data.get_vessels()
     name = vessel[0].name
-    signals.append(vessel[0].get_datum('environment.depth.belowTransducer').value)
     signals.append(vessel[0].get_datum('environment.wind.speedTrue').value)
     signals.append(convertradtodeg(vessel[0].get_datum('environment.wind.directionTrue').value))
     signals.append(convertradtodeg(vessel[0].get_datum('environment.wind.angleApparent').value))
@@ -27,9 +27,18 @@ def getsignalkdata():
     long = cords[1][0:10]
     signals.append(lat)
     signals.append(long)
-
+    signals.append(vessel[0].get_datum('environment.depth.belowTransducer').value)
     return signals
 
+
+def set_pixel(x, y, colour):
+    sense.set_pixel(x, y, colour)
+
+
+def get_pixel(x, y):
+    return sense.get_pixel(x, y)
+    """
+    return 0"""
 
 def render(data, currentCycle):
     keys = data.keys()
@@ -38,9 +47,8 @@ def render(data, currentCycle):
     for x in range(7, 0, -1):
         for y in range(0, 8):
             w = x - 1
-            colour = sense.get_pixel(w, y)
-            """print(str(x) + ',' + str(y) + "," + str(colour))"""
-            sense.set_pixel(x, y, colour)
+            colour = get_pixel(w, y)
+            set_pixel(x, y, colour)
 
     for y in range(0, 8):
         previousCycle = 0
@@ -61,20 +69,18 @@ def render(data, currentCycle):
             if previousData != currentData:
                 colour = red
 
-            """print(str(1) + ',' + str(y) + "," + str(colour))"""
-            sense.set_pixel(0, y, colour)
+            set_pixel(0, y, colour)
 
         if previousCycle not in keys:
-            """print(str(1) + ',' + str(y) + "," + str(colour))"""
-            sense.set_pixel(0, y, (0,0,255))
+            set_pixel(0, y, (0, 0, 255))
 
 
 def ticker():
     data = {}
-    for i in range(1, 10):
+    while True:
         for cycle in range(1, 9):
             data[cycle] = getsignalkdata()
-            print(data)
+            print(data[cycle])
             render(data, cycle)
             time.sleep(0.1)
 
