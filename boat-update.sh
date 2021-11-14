@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /var/www/html
-python3 dashboard.py
+python3 update-log.py
