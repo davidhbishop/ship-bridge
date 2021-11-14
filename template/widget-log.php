@@ -6,7 +6,7 @@
             <th>Wind</th>
             <th>Position</th>
             <th>Head</th>
-            <th>Boat speed</th>
+            <th>Speed</th>
             <th>SOG</th>
             <th>COG</th>
         </tr>
@@ -26,10 +26,10 @@
                     <td><?php print substr($event,0,4);?></td>
                     <td><?php print $data['wind-direction-true']?>&#176;(T) <?php print $data['wind-speed']?> Kts</td>
                     <td><?php print $data['latitude']?><br/><?php print $data['longitude']?></td>
-                    <th><?php print $data['heading-true']?>&#176;(T)</th>
-                    <th><?php print $data['speed-through-water']?> Kts</th>
-                    <th><?php print $data['speed-over-ground']?> Kts</th>
-                    <th><?php print $data['course-over-ground-true']?> &#176;(T)</th>
+                    <td><?php print $data['heading-true']?>&#176;(T)</td>
+                    <td><?php print $data['speed-through-water']?> Kts</td>
+                    <td><?php print $data['speed-over-ground']?> Kts</td>
+                    <td><?php print $data['course-over-ground-true']?> &#176;(T)</td>
                 </tr>
             <?php endif; ?>
         <?php endforeach; ?>

@@ -39,7 +39,7 @@ def render(data, currentCycle):
         for y in range(0, 8):
             w = x - 1
             colour = sense.get_pixel(w, y)
-            print(str(x) + ',' + str(y) + "," + str(colour))
+            """print(str(x) + ',' + str(y) + "," + str(colour))"""
             sense.set_pixel(x, y, colour)
 
     for y in range(0, 8):
@@ -61,11 +61,11 @@ def render(data, currentCycle):
             if previousData != currentData:
                 colour = red
 
-            print(str(1) + ',' + str(y) + "," + str(colour))
+            """print(str(1) + ',' + str(y) + "," + str(colour))"""
             sense.set_pixel(0, y, colour)
 
         if previousCycle not in keys:
-            print(str(1) + ',' + str(y) + "," + str(colour))
+            """print(str(1) + ',' + str(y) + "," + str(colour))"""
             sense.set_pixel(0, y, (0,0,255))
 
 
@@ -76,7 +76,7 @@ def ticker():
             data[cycle] = getsignalkdata()
             print(data)
             render(data, cycle)
-            time.sleep(0.5)
+            time.sleep(0.1)
 
 
 def main():
