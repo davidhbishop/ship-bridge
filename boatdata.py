@@ -17,7 +17,7 @@ def save_signalk():
     signalk_data = {}
 
     vessel = SK_CLIENT.data.get_vessels()
-    print("Name: " + vessel[0].name)
+    print("Name: " + str(vessel[0].name))
     for path in vessel[0].get_targets():
         datum = vessel[0].get_datum(path)
         string_path = str(path)
