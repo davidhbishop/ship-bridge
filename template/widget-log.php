@@ -1,5 +1,6 @@
-<div class="uk-width-1-1 uk-width-medium-1-2">
+<div class="uk-width-1-1 uk-width-large-1-2">
     <div class="uk-panel uk-panel-box uk-margin-top">
+    <h3 class="uk-panel-title">Boat log</h3>
     <table class="uk-table uk-table-striped">
         <tr>
             <th>Time</th>

@@ -1,5 +1,6 @@
-<div class="uk-width-1-1 uk-width-medium-1-2">
+<div class="uk-width-1-1 uk-width-large-1-2">
     <div class="uk-panel uk-panel-box uk-margin-top">
+    <h3 class="uk-panel-title">Environment log</h3>
     <table class="uk-table uk-table-striped">
         <tr>
             <th>Time</th>
@@ -20,9 +21,9 @@
                 <?php if ($displayTime==true && $display==true): ?>
                     <tr>
                         <td><?php print substr($event,0,4);?></td>
-                        <td><?php print $data['pressure']?></td>
-                        <td><?php print $data['temperature']?></td>
-                        <td><?php print $data['humidity']?></td>
+                        <td><?php print $data['pressure']?> mb</td>
+                        <td><?php print $data['temperature']?> &#176;C</td>
+                        <td><?php print $data['humidity']?>%</td>
                     </tr>
                 <?php endif; ?>
         <?php endforeach; ?>
