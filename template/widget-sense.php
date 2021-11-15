@@ -22,7 +22,7 @@
                     <tr>
                         <td><?php print substr($event,0,4);?></td>
                         <td><?php print $data['pressure']?> mb</td>
-                        <td><?php print $data['temperature']?> &#176;C</td>
+                        <td><?php print $data['temperature']?> C</td>
                         <td><?php print $data['humidity']?>%</td>
                     </tr>
                 <?php endif; ?>

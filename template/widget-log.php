@@ -25,12 +25,12 @@
             <?php if ($displayTime==true && $display==true): ?>
                 <tr>
                     <td><?php print substr($event,0,4);?></td>
-                    <td><?php print $data['wind-direction-true']?>&#176;(T) <?php print $data['wind-speed']?> Kts</td>
+                    <td><?php print $data['wind-direction-true']?>(T) <?php print $data['wind-speed']?> Kts</td>
                     <td><?php print $data['latitude']?><br/><?php print $data['longitude']?></td>
-                    <td><?php print $data['heading-true']?>&#176;(T)</td>
+                    <td><?php print $data['heading-true']?>(T)</td>
                     <td><?php print $data['speed-through-water']?> Kts</td>
                     <td><?php print $data['speed-over-ground']?> Kts</td>
-                    <td><?php print $data['course-over-ground-true']?> &#176;(T)</td>
+                    <td><?php print $data['course-over-ground-true']?>(T)</td>
                 </tr>
             <?php endif; ?>
         <?php endforeach; ?>
