@@ -5,7 +5,7 @@
     "keys": [
       {
         "tide-times": "conwy",
-        "admiralty-tidal": "0471A",
+        "tidal": "0471A",
         "gate": [
           {
             "open": "-3",

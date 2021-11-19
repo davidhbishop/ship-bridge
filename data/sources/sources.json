@@ -1,23 +1,24 @@
 [
   {
     "url": "https://www.tidetimes.org.uk/LOCATION-tide-times-DATE",
-    "type": "tide-times",
+    "type": "daylight",
     "DATE": "YYYYMMDD"
   },
   {
     "url": "https://admiraltyapi.azure-api.net/uktidalapi/api/V1/Stations/LOCATION/TidalEvents",
-    "type": "admiralty-tidal"
+    "type": "tidal",
+    "key": "e02bad75e2fd40139358632685fe3c18"
   },
   {
     "url": "https://www.metoffice.gov.uk/weather/specialist-forecasts/coast-and-sea/inshore-waters-forecast",
-    "type": "metoffice-inshore"
+    "type": "inshore"
   },
   {
     "url": "https://www.metoffice.gov.uk/weather/maps-and-charts/surface-pressure",
-    "type": "metoffice-pressure"
+    "type": "pressure"
   },
   {
-    "type": "metoffice-data",
+    "type": "weather",
     "url": "http://datapoint.metoffice.gov.uk/public/data/val/wxfcs/all/json/LOCATION?res=3hourly&key=a1087614-9404-4ffd-b995-32deb2b8b92d"
   }
 ]
