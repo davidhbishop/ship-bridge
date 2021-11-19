@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup as bs
 web_charset = "utf-8"
 mail_charset = "ISO-2022-JP"
 
-targeturl = "http://bella-sense/"  # Target URL for scraping
+targeturl = "http://bella-sense/email.php"  # Target URL for scraping
 targetclass = "h1"  # Target element for scraping
 
 #Email Variables

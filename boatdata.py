@@ -17,7 +17,6 @@ def save_signalk():
     signalk_data = {}
 
     vessel = SK_CLIENT.data.get_vessels()
-    print("Name: " + str(vessel[0].name))
     for path in vessel[0].get_targets():
         datum = vessel[0].get_datum(path)
         string_path = str(path)
@@ -92,7 +91,7 @@ def save_log():
 
 def process_boatdata():
     global SK_CLIENT
-    SK_CLIENT = Client()
+    SK_CLIENT = Client('bella-heart:3000')
 
     save_signalk()
     save_log()
