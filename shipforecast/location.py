@@ -2,7 +2,7 @@ class Location():
     def __init__(self, config):
         self.name = config['name']
         self.type = config['type']
-        self.keys = config['keys']
+        self.keys = config['keys'][0]
 
     def get_name(self):
         return self.name
@@ -17,7 +17,7 @@ class Location():
         return self.keys[name]
 
     def get_gate_open(self):
-        return self.keys['gate']['open']
+        return self.keys['gate'][0]['open']
 
     def get_gate_close(self):
-        return self.keys['gate']['close']
+        return self.keys['gate'][0]['close']

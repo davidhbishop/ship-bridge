@@ -16,4 +16,4 @@ class SourceManager(Manager):
     def getByType(self, type):
         for source in self.sources:
             if source.type == type:
-                return self.sources
+                return source

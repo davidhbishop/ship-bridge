@@ -1,6 +1,11 @@
-class Source():
-    def __init__(self,config):
-        self.url = config['url']
-        self.type = config['type']
-        self.date = config['DATE']
-        self.key = config['key']
+class Source:
+    def __init__(self, config):
+        for key in config:
+            if key == 'url':
+                self.url = config[key]
+            if key == 'type':
+                self.type = config[key]
+            if key == 'DATE':
+                self.date = config[key]
+            if key == 'key':
+                self.key = config[key]
