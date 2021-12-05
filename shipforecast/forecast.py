@@ -1,7 +1,7 @@
-from logmanager import LogManager
+from log import Log
 
 
 class Forecast:
     def __init__(self, source):
         self.source = source
-        self.log = LogManager()
+        self.log = Log()

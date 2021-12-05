@@ -1,8 +1,8 @@
 import json
-from forecastrequest import ForecastRequest
+from requestforecast import RequestForecast
 
 
-class JsonForecastRequest(ForecastRequest):
+class RequestForecastJson(RequestForecast):
     def get_json(self, url):
         response = self.get(url)
         if response.status_code == 200:

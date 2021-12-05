@@ -1,7 +1,7 @@
 import requests
 
 
-class ForecastRequest:
+class RequestForecast:
     def __init__(self):
         self.session = requests.session()
 
@@ -11,4 +11,8 @@ class ForecastRequest:
 
     def get_with_header(self, url, headers):
         response = self.session.get(url, headers=headers)
+        return response
+
+    def get_with_stream(self, url):
+        response = self.session.get(url, stream=True)
         return response

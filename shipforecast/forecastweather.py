@@ -1,9 +1,9 @@
 from forecast import Forecast
-from jsonforecastrequest import JsonForecastRequest
+from requestforecastjson import JsonForecastRequest
 from logdata import LogData
 
 
-class WeatherForecast(Forecast):
+class ForecastWeather(Forecast):
 
     def _get_data(self, location_name):
         url = self._get_url(location_name)

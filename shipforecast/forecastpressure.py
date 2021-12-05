@@ -1,13 +1,15 @@
 from forecast import Forecast
-from forecastrequest import ForecastRequest
+from requestforecast import RequestForecast
+from requestforecastfile import RequestForecastFile
 import bs4.element
 from bs4 import BeautifulSoup as bs
+from logdata import LogData
 
-class PressureForecast(Forecast):
 
+class ForecastPressure(Forecast):
     def _get_data(self):
         url = self._get_url()
-        request = ForecastRequest()
+        request = RequestForecast()
         return request.get(url)
 
     def _get_url(self):
@@ -70,14 +72,14 @@ class PressureForecast(Forecast):
             for row in list(rows.children):
                 if isinstance(row, bs4.element.Tag):
                     label = row.attrs.get("id")
-                    label = self.get_range(label)
+                    label = self._get_range(label)
                     date = row.attrs.get("data-value")
 
                     date_parts = date.split()
 
                     day = date_parts[4]
                     month_name = date_parts[5]
-                    month = self.get_month(month_name)
+                    month = self._get_month(month_name)
                     year = date_parts[6]
                     time = date_parts[0]
 
@@ -88,20 +90,20 @@ class PressureForecast(Forecast):
                             alt_parts = alt.split()
                             type = alt_parts[3]
 
-                    maps.append([url, year, month, day, time, type, label])
+                            maps.append([url, year, month, day, time, type, label])
 
         for rows in soup.find_all(id="colourCharts"):
             for row in list(rows.children):
                 if isinstance(row, bs4.element.Tag):
                     label = row.attrs.get("id")
-                    label = self.get_range(label)
+                    label = self._get_range(label)
                     date = row.attrs.get("data-value")
 
                     date_parts = date.split()
 
                     day = date_parts[4]
                     month_name = date_parts[5]
-                    month = self.get_month(month_name)
+                    month = self._get_month(month_name)
                     year = date_parts[6]
                     time = date_parts[0]
 
@@ -112,7 +114,7 @@ class PressureForecast(Forecast):
                             alt_parts = alt.split()
                             type = alt_parts[3]
 
-                    maps.append([url, year, month, day, time, type, label])
+                            maps.append([url, year, month, day, time, type, label])
 
         return maps
 
@@ -121,40 +123,21 @@ class PressureForecast(Forecast):
         month = map[2]
         day = map[3]
         time = map[4]
-        time = get_time(time)
+        time = self._get_time(time)
 
         url = map[0]
-        label = map[6]
+        event_type = map[6]
 
-        pathname = 'data/forecast/' + str(year) + str(month).zfill(2) + str(day).zfill(2)
-        filename = pathname + '/' + time + '-pressure-map-' + label + '.gif'
+        date_url = str(year) + str(month).zfill(2) + str(day).zfill(2)
+        name = 'pressure-map'
 
-        self._download_file(pathname, filename, url)
+        log_data = LogData(date_url, name, event_type)
+        log_data.set_time(time)
 
-    def _download_file(self, pathname, filename, url):
-        """
-        Downloads a file given an URL and puts it in the folder `pathname`
-        """
-        # if path doesn't exist, make that path dir
-        if not os.path.isdir(pathname):
-            os.makedirs(pathname)
-        # download the body of response by chunk, not immediately
-        response = requests.get(url, stream=True)
+        file = RequestForecastFile()
+        response = file.get_file(url)
 
-        # get the total file size
-        file_size = int(response.headers.get("Content-Length", 0))
-
-        # progress bar, changing the unit to bytes instead of iteration (default by tqdm)
-        progress = tqdm(response.iter_content(1024), f"Downloading {filename}", total=file_size, unit="B",
-                        unit_scale=True,
-                        unit_divisor=1024)
-        with open(filename, "wb") as f:
-            for data in progress.iterable:
-                # write data read to the file
-                f.write(data)
-                # update the progress bar manually
-                progress.update(len(data))
+        self.log.write_file(log_data, response)
 
     def get(self):
         maps = self._get_maps()
-

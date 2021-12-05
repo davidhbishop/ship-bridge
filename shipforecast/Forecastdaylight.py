@@ -1,15 +1,16 @@
 from forecast import Forecast
-from forecastrequest import ForecastRequest
+from requestforecast import RequestForecast
 from logdata import LogData
 from sevendays import SevenDays
 import bs4.element
 from bs4 import BeautifulSoup as bs
 
-class DaylightForecast(Forecast):
+
+class ForecastDaylight(Forecast):
 
     def _get_data(self, location_name, date):
         url = self._get_url(location_name, date)
-        request = ForecastRequest()
+        request = RequestForecast()
         return request.get(url)
 
     def _get_url(self, location_name, date):

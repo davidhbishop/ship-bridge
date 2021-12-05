@@ -1,5 +1,5 @@
 from forecast import Forecast
-from jsonforecastrequest import JsonForecastRequest
+from requestforecastjson import RequestForecastJson
 from britishtimemanager import BritishTimeManager
 from tidalgate import TidalGate
 from logdata import LogData
@@ -10,7 +10,7 @@ class TidalForecast(Forecast):
     def _get_events(self, location_name):
         url = self._get_url(location_name)
         headers = self._get_headers()
-        request = JsonForecastRequest()
+        request = RequestForecastJson()
         return request.get_json_with_header(url, headers)
 
     def _get_url(self, location_name):
@@ -55,7 +55,7 @@ class TidalForecast(Forecast):
                     log_data.set_time(gate.get_open_time())
                     log_data.add_data('type', 'gateopen')
                     log_data.add_data('time', gate.get_open_time())
-                    self.log.write_data(log_data)
+                    self.log.write_json(log_data)
 
                     """Gate close time"""
                     gate.set_close_difference(location.get_gate_close())
@@ -63,4 +63,4 @@ class TidalForecast(Forecast):
                     log_data.set_time(gate.get_close_time())
                     log_data.add_data('type', 'gateclose')
                     log_data.add_data('time', gate.get_close_time())
-                    self.log.write_data(log_data)
+                    self.log.write_json(log_data)

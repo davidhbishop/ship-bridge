@@ -1,8 +1,8 @@
 class LogData:
-    def __init__(self, date, location_name, type):
+    def __init__(self, date, name, event_type):
         self.date = date
-        self.location_name = location_name
-        self.type = type
+        self.name = name
+        self.event_type = event_type
         self.data = {}
         self.hour = ''
         self.minute = ''

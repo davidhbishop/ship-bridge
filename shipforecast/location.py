@@ -1,4 +1,4 @@
-class Location():
+class Location:
     def __init__(self, config):
         self.name = config['name']
         self.type = config['type']
