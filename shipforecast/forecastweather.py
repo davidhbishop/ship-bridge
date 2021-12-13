@@ -1,5 +1,5 @@
 from forecast import Forecast
-from requestforecastjson import JsonForecastRequest
+from requestforecastjson import RequestForecastJson
 from logdata import LogData
 
 
@@ -7,7 +7,7 @@ class ForecastWeather(Forecast):
 
     def _get_data(self, location_name):
         url = self._get_url(location_name)
-        request = JsonForecastRequest()
+        request = RequestForecastJson()
         return request.get_json(url)
 
     def _get_url(self, location_name):
@@ -50,5 +50,5 @@ class ForecastWeather(Forecast):
                 log_data = LogData(date_folder, location.get_name(), 'datapoint')
                 log_data.set_time(time_file)
                 log_data.set_data(datapoint)
-                self.log.write_data(log_data)
+                self.log.write_json(log_data)
 

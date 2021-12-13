@@ -35,7 +35,7 @@ class ForecastDaylight(Forecast):
             log_data = LogData(date['url'], location_name, movement['type'])
             log_data.set_time(movement['time'])
             log_data.set_data(movement)
-            self.log.write_data(log_data)
+            self.log.write_json(log_data)
 
     def _get_universe(self, soup):
         universe = []

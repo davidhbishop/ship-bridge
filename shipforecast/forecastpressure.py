@@ -48,7 +48,7 @@ class ForecastPressure(Forecast):
         else:
             return "1200"
 
-    def _get_range(name):
+    def _get_range(self, name):
         name = name[5:]
         type = name[:-1]
         range = int(name[-1:])
@@ -140,4 +140,6 @@ class ForecastPressure(Forecast):
         self.log.write_file(log_data, response)
 
     def get(self):
-        maps = self._get_maps()
+        map_items = self._get_maps()
+        for map_item in map_items:
+            self._download_map(map_item)

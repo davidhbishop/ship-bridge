@@ -42,7 +42,7 @@ class TidalForecast(Forecast):
             log_data.add_data('type', event_type)
             log_data.add_data('time', time)
             log_data.add_data('depth', height)
-            self.log.write_data(log_data)
+            self.log.write_json(log_data)
 
             if (event_type=='HighWater'):
 

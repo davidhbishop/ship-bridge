@@ -14,5 +14,5 @@ class RequestForecast:
         return response
 
     def get_with_stream(self, url):
-        response = self.session.get(url, stream=True)
+        response = requests.get(url, stream=True)
         return response
