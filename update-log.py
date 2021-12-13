@@ -3,7 +3,7 @@ from boatdata import process_boatdata
 
 def main():
     process_sensehat()
-    process_boatdata() 
+"""    process_boatdata() """
 
 if __name__ == "__main__":
     main()

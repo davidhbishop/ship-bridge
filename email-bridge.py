@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup as bs
 web_charset = "utf-8"
 mail_charset = "ISO-2022-JP"
 
-targeturl = "http://bella-sense/email.php"  # Target URL for scraping
+targeturl = "http://bella-heart/email.php"  # Target URL for scraping
 targetclass = "h1"  # Target element for scraping
 
 #Email Variables
@@ -31,7 +31,7 @@ def scraping(url):
 		if len(target) == 0:
 			return statusNG
 		else:
-			return statusOK + target.decode(web_charset)
+			return target.decode(web_charset)
 	except:
 		return statusNG
 
@@ -60,7 +60,7 @@ sender = Emailer()
 
 if __name__ == "__main__":
 	sendTo = 'davidhenrybishop@gmail.com'
-	emailSubject = "Ships log!"
+	emailSubject = "Troppo Bella - Daily logbook"
 	emailContent = scraping(targeturl)
 	sender.sendmail(sendTo, emailSubject, emailContent)
 	print("Email Sent")
