@@ -254,6 +254,12 @@ async def provision_device(provisioning_host, id_scope, registration_id, symmetr
     provisioning_device_client.provisioning_payload = {"modelId": model_id}
     return await provisioning_device_client.register()
 
+#####
+#Main
+# Load environment variables and provision device
+# One assigned await for connection
+# Update some properties
+# Use asyncio.gather to run a collection of tasks at the same time
 
 async def main():
     switch = os.getenv("IOTHUB_DEVICE_SECURITY_TYPE")
