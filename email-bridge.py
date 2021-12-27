@@ -5,7 +5,7 @@ import datetime
 import requests
 import smtplib
 import time
-import io
+import os
 
 from bs4 import BeautifulSoup as bs
 
@@ -19,7 +19,7 @@ targetclass = "h1"  # Target element for scraping
 #Email Variables
 SMTP_SERVER = 'smtp.gmail.com' #Email Server (don't change!)
 SMTP_PORT = 465 #Server Port (don't change!)
-GMAIL_USERNAME =  os.getenv("MAIL_USERNAME") #change this to match your gmail account
+GMAIL_USERNAME = os.getenv("MAIL_USERNAME") #change this to match your gmail account
 GMAIL_PASSWORD = os.getenv("MAIL_PASSWORD")  #change this to match your gmail password
 
 statusOK = u"Found / "
