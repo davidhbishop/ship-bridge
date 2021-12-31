@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd /var/www/html
-python3 update-forecast.py
+cd /var/www/html/shipforecast
+python3 main.py
