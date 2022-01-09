@@ -38,7 +38,7 @@ def scraping(url):
 
 
 class Emailer:
-	def sendmail(self, recipient, subject, content):
+	def sendmail(self, recipient, subject, content, username, password):
 		# Create Headers
 		headers = ["From: " + GMAIL_USERNAME, "Subject: " + subject, "To: " + recipient,
 				   "MIME-Version: 1.0", "Content-Type: text/html"]
@@ -50,7 +50,7 @@ class Emailer:
 
 
 		# Login to Gmail
-		session.login(GMAIL_USERNAME, GMAIL_PASSWORD)
+		session.login(username, password)
 
 		# Send Email & Exit
 		session.sendmail(GMAIL_USERNAME, recipient, headers + "\r\n\r\n" + content)
@@ -63,5 +63,5 @@ if __name__ == "__main__":
 	sendTo = 'davidhenrybishop@gmail.com'
 	emailSubject = "Troppo Bella - Daily logbook"
 	emailContent = scraping(targeturl)
-	sender.sendmail(sendTo, emailSubject, emailContent)
+	sender.sendmail(sendTo, emailSubject, emailContent, GMAIL_USERNAME, GMAIL_PASSWORD)
 	print("Email Sent")

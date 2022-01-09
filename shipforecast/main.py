@@ -2,8 +2,9 @@ from locationmanager import LocationManager
 from sourcemanager import SourceManager
 from forecasttidal import TidalForecast
 from forecastweather import ForecastWeather
-from Forecastdaylight import ForecastDaylight
+from forecastdaylight import ForecastDaylight
 from forecastpressure import ForecastPressure
+from forecastinshore import ForecastInshore
 
 locations_path = '../data/locations/ship-locations.json'
 sources_path = '../data/sources/ship-sources.json'
@@ -17,7 +18,7 @@ def main():
     weather = ForecastWeather(sources.getByType('weather'))
     daylight = ForecastDaylight(sources.getByType('daylight'))
     pressure = ForecastPressure(sources.getByType('pressure'))
-
+    inshore = ForecastInshore(sources.getByType('inshore'))
 
     for location in locations.getItems():
 
@@ -31,6 +32,7 @@ def main():
             daylight.get(location)
     
     pressure.get()
+    inshore.get()
 
 
 
