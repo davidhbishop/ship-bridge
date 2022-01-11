@@ -4,7 +4,8 @@ import bs4.element
 from bs4 import BeautifulSoup as bs
 from logdata import LogData
 from datetime import datetime
-
+from datetime import timedelta
+from pprint import pprint
 
 class ForecastInshore(Forecast):
 
@@ -66,6 +67,7 @@ class ForecastInshore(Forecast):
                             sea = data[7].contents[0]
                             weather = data[11].contents[0]
                             visibility = data[15].contents[0]
+                            forecast = ''
                             output = {
                                 "wind": wind,
                                 "sea": sea,
@@ -85,12 +87,26 @@ class ForecastInshore(Forecast):
         return forecasts
 
     def _save_forecast(self, forecast, date, area):
-        log_data = LogData(date, 'inshore-forecast', )
+        log_data = LogData(date, "inshore-forecast", str(area))
+        log_data.set_time("00:00")
 
+        #Add forecast[0] with additional values
+
+        today = {
+            "area": forecast["area"],
+            "warning": forecast["warning"],
+            "forecast": forecast["forecast"][0]
+        }
+
+        log_data.set_data(today)
+        self.log.write_json(log_data)
 
     def _save_outlook(self, outlook, date, area):
-
-
+        log_data = LogData(date, "inshore-outlook", str(area))
+        log_data.set_time("00:00")
+        log_data.set_data(forecast)
+        #Add outlook (forecast[1]) if set with additional values
+        self.log.write_json(log_data)
 
     def get(self):
         now = datetime.now()
@@ -99,8 +115,11 @@ class ForecastInshore(Forecast):
         tomorrow_time = now + timedelta(days=1)
         tomorrow_date = tomorrow_time.strftime("%Y%m%d")
 
-        forecasts = self.get_forecasts()
+        data = self.get_forecasts()
+#        pprint(forecasts)
         area = 0
-        for forecast in forecasts:
-            self._save_forecast(forecast, today_date, area)
-            area = area + 1;
+        for forecasts in data:
+            for forecast in forecasts:
+                pprint(forecast)
+ #           self._save_forecast(forecast, today_date, area)
+                area = area + 1;

@@ -20,18 +20,18 @@ def main():
     pressure = ForecastPressure(sources.getByType('pressure'))
     inshore = ForecastInshore(sources.getByType('inshore'))
 
-    for location in locations.getItems():
+#    for location in locations.getItems():
 
-        if location.has('tidal'):
-            tidal.get(location)
+#        if location.has('tidal'):
+#            tidal.get(location)
 
-        if location.has('weather'):
-            weather.get(location)
+#        if location.has('weather'):
+#            weather.get(location)
 
-        if location.has('daylight'):
-            daylight.get(location)
+#        if location.has('daylight'):
+#            daylight.get(location)
     
-    pressure.get()
+#    pressure.get()
     inshore.get()
 
 
