@@ -67,7 +67,6 @@ class ForecastInshore(Forecast):
                             sea = data[7].contents[0]
                             weather = data[11].contents[0]
                             visibility = data[15].contents[0]
-                            forecast = ''
                             output = {
                                 "wind": wind,
                                 "sea": sea,
@@ -86,8 +85,8 @@ class ForecastInshore(Forecast):
 
         return forecasts
 
-    def _save_forecast(self, forecast, date, area):
-        log_data = LogData(date, "inshore-forecast", str(area))
+    def _save_forecast(self, forecast, date, index):
+        log_data = LogData(date, "inshore-forecast", str(index))
         log_data.set_time("00:00")
 
         #Add forecast[0] with additional values
@@ -115,11 +114,10 @@ class ForecastInshore(Forecast):
         tomorrow_time = now + timedelta(days=1)
         tomorrow_date = tomorrow_time.strftime("%Y%m%d")
 
-        data = self.get_forecasts()
-#        pprint(forecasts)
-        area = 0
-        for forecasts in data:
-            for forecast in forecasts:
-                pprint(forecast)
- #           self._save_forecast(forecast, today_date, area)
-                area = area + 1;
+        areas = self.get_forecasts()
+        index = 0
+        for area in areas:
+         if index > 0:
+#           pprint(area["area"])
+           self._save_forecast(area, today_date, index)
+         index = index + 1;

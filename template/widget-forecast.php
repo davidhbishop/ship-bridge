@@ -3,10 +3,13 @@
 $forecasts = array();
 
 foreach($times as $event=>$data) {
-    #print '<p>'.$event.'</p>';
+    //print '<p>'.$event.'</p>';
     if (strpos($event,'inshore')) {
-        $index = substr($event,18);
+        //print '<p>'.$event.'</p>';
+        $index = substr($event,22);
+        //print '<p>'.$index.'</p>';
         $index = substr($index, 0,strlen($index)-5);
+        //print '<p>'.$index.'</p>';
         $forecasts[$index] = $data;
     }
 }
@@ -15,6 +18,7 @@ $forecast = $forecasts[$area];
 $name = $forecast['area'];
 $warning = $forecast['warning'];
 
+//print_r($times);
 
 ?>
 
