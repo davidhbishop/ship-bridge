@@ -9,6 +9,7 @@ from forecastinshore import ForecastInshore
 locations_path = '../data/locations/ship-locations.json'
 sources_path = '../data/sources/ship-sources.json'
 
+#Hello Tabitha
 
 def main():
     locations = LocationManager(locations_path)
