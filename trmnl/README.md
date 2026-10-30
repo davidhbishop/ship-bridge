@@ -73,10 +73,10 @@ worker. Change these in `wrangler.toml` if the marina's sill times differ.
 
 ## Time zones
 
-All times shown are Europe/London. The tidal worker currently stores tide times as
-UTC+1 all year round (it hard-codes BST), so the bridge undoes that with
-`TIDE_STORED_OFFSET = "1"`. When the tidal worker is fixed to store real local
-time, set it to `"local"`. Sunrise and sunset from tidetimes.org.uk are already local.
+All times shown are Europe/London. Tide and gate records carry an `at` UTC
+timestamp, which the bridge uses when present. Older records without it are read as
+local time (`TIDE_STORED_OFFSET = "local"`); set a number of hours instead if a
+feed stores a fixed offset. Sunrise and sunset from tidetimes.org.uk are already local.
 
 ## Deploying the worker
 

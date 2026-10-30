@@ -127,9 +127,12 @@ function normaliseEvents(records, config) {
 
     const [y, m, d] = [r._folder.slice(0, 4), r._folder.slice(4, 6), r._folder.slice(6, 8)].map(Number);
     const isTide = type === "HW" || type === "LW";
-    const at = isTide && config.tideOffset !== "local"
-      ? Date.UTC(y, m - 1, d, clock.h, clock.mi) - config.tideOffset * HOUR
-      : fromLocal(y, m, d, clock.h, clock.mi);
+    // Newer records carry the UTC instant; older ones only a clock time.
+    const at = r.at && !Number.isNaN(Date.parse(r.at))
+      ? Date.parse(r.at)
+      : isTide && config.tideOffset !== "local"
+        ? Date.UTC(y, m - 1, d, clock.h, clock.mi) - config.tideOffset * HOUR
+        : fromLocal(y, m, d, clock.h, clock.mi);
 
     const key = `${type}@${at}`;
     if (seen.has(key)) continue;
@@ -269,11 +272,18 @@ function sunView(day, events, now, todayStart) {
  * chart box (x left to right, y top to bottom) so the markup can draw the
  * line in a stretched SVG and place labels with plain CSS.
  */
+// Semi-diurnal tide: high waters come round about every 12h 25m.
+const TIDE_CYCLE = (12 * 60 + 25) * 60 * 1000;
+
 function tideCurve(extremes, gates, dayStart, now) {
   const dayEnd = dayStart + DAY;
-  const before = extremes.filter((e) => e.at <= dayStart).slice(-1);
-  const after = extremes.filter((e) => e.at >= dayEnd).slice(0, 1);
-  const span = [...before, ...extremes.filter((e) => e.at > dayStart && e.at < dayEnd), ...after];
+  const inside = extremes.filter((e) => e.at > dayStart && e.at < dayEnd);
+  let before = extremes.filter((e) => e.at <= dayStart).slice(-1);
+  let after = extremes.filter((e) => e.at >= dayEnd).slice(0, 1);
+  // A neighbouring day's file can be missing; borrow the tide one cycle on.
+  if (!before.length && inside.length > 1) before = [{ ...inside[1], at: inside[1].at - TIDE_CYCLE }];
+  if (!after.length && inside.length > 1) after = [{ ...inside[inside.length - 2], at: inside[inside.length - 2].at + TIDE_CYCLE }];
+  const span = [...before, ...inside, ...after];
   if (span.length < 2 || span[0].at > dayStart || span[span.length - 1].at < dayEnd) return null;
   if (span.some((e) => e.height === null)) return null;
 
