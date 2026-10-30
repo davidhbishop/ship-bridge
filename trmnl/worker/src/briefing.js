@@ -266,15 +266,15 @@ function sunView(day, events, now, todayStart) {
 
 // ---------------------------------------------------------------- tide curve
 
+// Semi-diurnal tide: high waters come round about every 12h 25m.
+const TIDE_CYCLE = (12 * 60 + 25) * 60 * 1000;
+
 /**
  * Today's tide curve, sampled every 15 minutes using cosine interpolation
  * between successive high and low waters. Coordinates are percentages of the
  * chart box (x left to right, y top to bottom) so the markup can draw the
  * line in a stretched SVG and place labels with plain CSS.
  */
-// Semi-diurnal tide: high waters come round about every 12h 25m.
-const TIDE_CYCLE = (12 * 60 + 25) * 60 * 1000;
-
 function tideCurve(extremes, gates, dayStart, now) {
   const dayEnd = dayStart + DAY;
   const inside = extremes.filter((e) => e.at > dayStart && e.at < dayEnd);
