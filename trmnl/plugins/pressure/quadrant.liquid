@@ -1,0 +1,8 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% if chart %}
+  <div class="panel grow" style="align-items: center;"><img class="image" src="{{ chart.url }}" style="height: 100%; aspect-ratio: 891 / 601; object-fit: contain;"></div>
+  {% else %}<div class="panel grow"><div class="body lg">No pressure chart</div></div>{% endif %}
+</div>
+</div>
+<div class="title_bar"><span class="title">Pressure</span><span class="instance">{{ chart.valid }}</span></div>

@@ -1,6 +1,6 @@
 // Runs the bridge against a local copy of the R2 bucket.
 // Usage: node test/run.mjs <r2-dir> [iso-time] [route]
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import worker from "../src/index.js";
 
 const [dir, when, route = "/morning"] = process.argv.slice(2);
@@ -21,6 +21,11 @@ const env = {
         const text = await readFile(`${dir}/${key}`, "utf8");
         return { json: async () => JSON.parse(text), text: async () => text };
       } catch { return null; }
+    },
+    async list({ prefix }) {
+      const [folder, start] = prefix.split("/");
+      const names = await readdir(`${dir}/${folder}`).catch(() => []);
+      return { objects: names.filter((n) => n.startsWith(start)).map((n) => ({ key: `${folder}/${n}` })) };
     },
   },
 };

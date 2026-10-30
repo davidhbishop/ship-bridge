@@ -4,6 +4,8 @@
  * R2 layout (written by the tidal, daylight and inshore workers):
  *   YYYYMMDD/data.json                      list of {time, name, event_type, ...}
  *   YYYYMMDD/0000-inshore-forecast-N.json   {area, warning, forecast:{wind, sea, weather, visibility}}
+ *   config/settings.json                    {home_port, inshore_areas, ports:[{id, name, gate}]}
+ *                                           written by the dashboard; optional
  *
  * Every event is turned into an absolute instant, so it does not matter which
  * day folder an event was filed under, and all times shown are Europe/London.
@@ -13,8 +15,8 @@ const ZONE = "Europe/London";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
-export async function buildBriefing(env, now) {
-  const config = readConfig(env);
+export async function buildBriefing(env, now, options = {}) {
+  const config = readConfig(env, await readJson(env, "config/settings.json", null), options);
   const today = londonParts(now);
   const todayStart = fromLocal(today.y, today.m, today.d, 0, 0);
 
@@ -28,7 +30,9 @@ export async function buildBriefing(env, now) {
   const gates = gateWindows(extremes, config);
 
   const forecast = await readForecast(env, config, today);
-  const gate = gateStatus(gates, now, extremes.length > 0);
+  const gate = config.hasGate
+    ? gateStatus(gates, now, extremes.length > 0)
+    : { known: false, status: "NO GATE", headline: "No gate here", detail: "" };
 
   const days = [0, 1, 2].map((n) => dayView(addDays(today, n), n, events, gates));
   const sun = sunView(days[0], events, now, todayStart);
@@ -41,6 +45,7 @@ export async function buildBriefing(env, now) {
     updated: formatTime(now.getTime()),
     date_label: formatDate(now.getTime(), { weekday: "long", day: "numeric", month: "long" }),
     port: config.port,
+    inshore_areas: config.areas,
     gate,
     next_tide: nextTide ? { ...extremeView(nextTide), in: formatDuration(nextTide.at - now.getTime()) } : null,
     sun,
@@ -53,16 +58,37 @@ export async function buildBriefing(env, now) {
   };
 }
 
-function readConfig(env) {
+/**
+ * Settings come from config/settings.json when the dashboard has saved one,
+ * otherwise from the worker's vars. ?area= on the request picks which inshore
+ * area to show, so one TRMNL plugin can be set up per area.
+ */
+function readConfig(env, settings, options) {
   const offset = String(env.TIDE_STORED_OFFSET ?? "1");
+  const ports = Array.isArray(settings?.ports) ? settings.ports : [];
+  const homeId = String(settings?.home_port || "").toLowerCase();
+  const home = ports.find((p) => String(p.id).toLowerCase() === homeId) || ports.find((p) => p.home) || null;
+  const fallbackGate = { open_h: Number(env.GATE_OPEN_HOURS ?? -2), close_h: Number(env.GATE_CLOSE_HOURS ?? 3) };
+  const gate = home ? home.gate : fallbackGate;
+
+  const areas = (Array.isArray(settings?.inshore_areas) && settings.inshore_areas.length
+    ? settings.inshore_areas
+    : String(env.INSHORE_AREAS || "9,10,11").split(",")
+  ).map((a) => String(a).trim());
+  const preferred = String(env.FORECAST_AREA || "11");
+  const requested = options.area ? String(options.area) : null;
+
   return {
-    port: env.PORT_NAME || "Conwy",
-    area: String(env.FORECAST_AREA || "11"),
+    port: home?.name || env.PORT_NAME || "Conwy",
+    portIds: (home ? [home.id, home.name] : [env.PORT_NAME || "Conwy"]).filter(Boolean).map((n) => String(n).toLowerCase()),
+    areas,
+    area: requested || (areas.includes(preferred) ? preferred : areas[areas.length - 1]),
     // The tidal worker currently writes tide times as UTC+1 all year round.
     // Set this to "local" once it writes real Europe/London times.
     tideOffset: offset === "local" ? "local" : Number(offset),
-    gateOpen: Number(env.GATE_OPEN_HOURS ?? -2),
-    gateClose: Number(env.GATE_CLOSE_HOURS ?? 3),
+    hasGate: Boolean(gate),
+    gateOpen: Number(gate?.open_h ?? 0),
+    gateClose: Number(gate?.close_h ?? 0),
     strongWind: Number(env.STRONG_WIND_FORCE ?? 6),
     gateWarnMinutes: Number(env.GATE_WARN_MINUTES ?? 90),
   };
@@ -90,11 +116,10 @@ const TYPES = {
 };
 
 function normaliseEvents(records, config) {
-  const port = config.port.toLowerCase();
   const seen = new Map();
 
   for (const r of records) {
-    if (!r || !r.name || r.name.toLowerCase() !== port) continue;
+    if (!r || !r.name || !config.portIds.includes(r.name.toLowerCase())) continue;
     const type = TYPES[(r.event_type || r.type || "").toLowerCase()];
     if (!type || !r._folder) continue;
     const clock = parseClock(r.time);
@@ -366,7 +391,7 @@ function buildAlerts({ forecast, gate, extremes, config }) {
 
   if (!extremes.length) {
     add("warning", "No tide data", "Check the tidal worker before relying on gate times");
-  } else if (gate.open && gate.change_minutes <= config.gateWarnMinutes) {
+  } else if (config.hasGate && gate.open && gate.change_minutes <= config.gateWarnMinutes) {
     add("caution", `Gate closes at ${gate.change_time}`, `In ${gate.change_in}`);
   }
 

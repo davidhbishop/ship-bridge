@@ -10,6 +10,7 @@ bucket_name = "forecast"
 [vars]
 PORT_NAME = "Conwy"
 FORECAST_AREA = "11"
+INSHORE_AREAS = "9,10,11"
 # The tidal worker stores tide times as UTC+1 all year. Set to "local" once it writes Europe/London times.
 TIDE_STORED_OFFSET = "1"
 GATE_OPEN_HOURS = "-2"
