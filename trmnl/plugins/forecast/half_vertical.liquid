@@ -1,0 +1,10 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% if forecast.warning != '' %}<div class="alert warning"><span class="md clamp2">&#9888; {{ forecast.warning }}</span></div>{% endif %}
+  <div class="panel grow"><div class="cap"><span>Wind</span>{% if forecast.max_force %}<span>F{{ forecast.max_force }}</span>{% endif %}</div><div class="body md clamp3">{{ forecast.wind }}</div></div>
+  <div class="panel grow"><div class="cap"><span>Sea</span></div><div class="body sm clamp3">{{ forecast.sea }}</div></div>
+  <div class="panel grow"><div class="cap"><span>Weather</span></div><div class="body sm clamp2">{{ forecast.weather }}</div></div>
+  <div class="panel grow"><div class="cap"><span>Visibility</span></div><div class="body sm clamp2">{{ forecast.visibility }}</div></div>
+</div>
+</div>
+<div class="title_bar"><span class="title">Inshore &middot; area {{ forecast.area_number }}</span><span class="instance">{{ forecast.issued }}</span></div>

@@ -1,0 +1,10 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  <div class="panel grow {% if gate.open %}gate-open{% endif %}">
+    <div class="cap"><span>Gate</span><span>{{ gate.window }}</span></div>
+    <div class="body"><div class="xl">{{ gate.status }}</div><div class="sm">{{ gate.headline }}</div><div class="sm">{% if next_tide %}{{ next_tide.type }} {{ next_tide.time }} &middot; {{ next_tide.height }} m{% endif %}</div></div>
+  </div>
+  {% if alert_count > 0 %}<div class="alert {{ alerts[0].level }}"><span class="sm clip">! {{ alerts[0].title }}</span></div>{% endif %}
+</div>
+</div>
+<div class="title_bar"><span class="title">{{ port }}</span><span class="instance">{{ updated }}</span></div>

@@ -1,0 +1,70 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% for a in alerts limit: 1 %}
+  <div class="alert {{ a.level }}">
+    <span class="mark">{% if a.level == 'warning' %}&#9888;{% else %}!{% endif %}</span>
+    <div class="grow">
+      <div class="lg clip">{{ a.title }}</div>
+      <div class="sm clip">{{ a.detail }}</div>
+    </div>
+    {% if alert_count > 1 %}<span class="sm fixed">+{{ alert_count | minus: 1 }} more</span>{% endif %}
+  </div>
+  {% endfor %}
+
+  <div class="row fixed">
+    <div class="panel grow {% if gate.open %}gate-open{% endif %}" style="flex: 1.3;">
+      <div class="cap"><span>{{ port }} marina gate</span><span>{{ gate.window }}</span></div>
+      <div class="body">
+        <div class="xxl">{{ gate.status }}</div>
+        <div class="md">{{ gate.headline }}{% if gate.day_label and gate.day_label != 'today' %} {{ gate.day_label }}{% endif %}</div>
+        <div class="sm">{{ gate.detail }}</div>
+      </div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Next tide</span><span>{{ next_tide.in }}</span></div>
+      <div class="body">
+        {% if next_tide %}
+        <div class="xl tnum">{{ next_tide.time }}</div>
+        <div class="md">{{ next_tide.name }}</div>
+        <div class="sm">{{ next_tide.height }} m</div>
+        {% else %}<div class="md">No tide data</div>{% endif %}
+      </div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Sun</span><span>{{ sun.daylight }}</span></div>
+      <div class="body">
+        <div class="lg tnum">&#9650; {{ sun.sunrise | default: '--:--' }}</div>
+        <div class="lg tnum">&#9660; {{ sun.sunset | default: '--:--' }}</div>
+        <div class="xs clip">{{ sun.next }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row grow">
+    <div class="panel" style="flex: 1;">
+      <div class="cap"><span>Tides today</span><span>{{ days[0].date }}</span></div>
+      <div class="body">
+        {% for t in days[0].tides %}
+        <div class="line"><span class="md"><span class="tag {% if t.type == 'HW' %}solid{% endif %}">{{ t.type }}</span></span><span class="md tnum">{{ t.time }}</span><span class="sm tnum">{{ t.height }} m</span></div>
+        {% else %}<div class="md">No tide data</div>{% endfor %}
+        {% if days[0].moon_phase %}<div class="xs muted clip" style="padding-top: 4px;">{{ days[0].moon_phase }}</div>{% endif %}
+      </div>
+    </div>
+    <div class="panel" style="flex: 1.7;">
+      <div class="cap"><span>Inshore forecast &middot; area {{ forecast.area_number }}</span><span>{{ forecast.issued }}</span></div>
+      <div class="body">
+        {% if forecast.known %}
+        <div class="line"><span class="label fixed" style="width: 80px;">Wind</span><span class="sm grow clamp2">{{ forecast.wind }}</span></div>
+        <div class="line"><span class="label fixed" style="width: 80px;">Sea</span><span class="sm grow clamp2">{{ forecast.sea }}</span></div>
+        <div class="line"><span class="label fixed" style="width: 80px;">Weather</span><span class="sm grow clip">{{ forecast.weather }}</span></div>
+        <div class="line"><span class="label fixed" style="width: 80px;">Vis</span><span class="sm grow clamp2">{{ forecast.visibility }}</span></div>
+        {% else %}<div class="md">No forecast in R2 today</div>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="title_bar">
+  <span class="title">Ship Bridge &middot; {{ port }}</span>
+  <span class="instance">{{ date_label }} &middot; updated {{ updated }}</span>
+</div>

@@ -1,0 +1,18 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% if alert_count > 0 %}<div class="alert {{ alerts[0].level }}"><span class="mark">!</span><div class="grow md clamp2">{{ alerts[0].title }}</div></div>{% endif %}
+  <div class="panel fixed {% if gate.open %}gate-open{% endif %}">
+    <div class="cap"><span>Gate</span><span>{{ gate.window }}</span></div>
+    <div class="body"><div class="xl">{{ gate.status }}</div><div class="sm">{{ gate.headline }}</div></div>
+  </div>
+  <div class="panel grow">
+    <div class="cap"><span>Tides today</span></div>
+    <div class="body">{% for t in days[0].tides %}<div class="line"><span class="md">{{ t.type }}</span><span class="md tnum">{{ t.time }}</span><span class="sm tnum">{{ t.height }} m</span></div>{% endfor %}</div>
+  </div>
+  <div class="panel fixed">
+    <div class="cap"><span>Sun</span><span>{{ sun.daylight }}</span></div>
+    <div class="body row"><span class="lg tnum grow">&#9650; {{ sun.sunrise }}</span><span class="lg tnum grow">&#9660; {{ sun.sunset }}</span></div>
+  </div>
+</div>
+</div>
+<div class="title_bar"><span class="title">{{ port }}</span><span class="instance">{{ updated }}</span></div>

@@ -1,0 +1,20 @@
+name = "trmnl-bridge"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+workers_dev = true
+
+[[r2_buckets]]
+binding = "FORECAST"
+bucket_name = "forecast"
+
+[vars]
+PORT_NAME = "Conwy"
+FORECAST_AREA = "11"
+# The tidal worker stores tide times as UTC+1 all year. Set to "local" once it writes Europe/London times.
+TIDE_STORED_OFFSET = "1"
+GATE_OPEN_HOURS = "-2"
+GATE_CLOSE_HOURS = "3"
+STRONG_WIND_FORCE = "6"
+GATE_WARN_MINUTES = "90"
+
+# Secret: wrangler secret put API_KEY  (the same value goes in each TRMNL plugin's "Bridge API key" field)

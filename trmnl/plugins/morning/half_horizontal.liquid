@@ -1,0 +1,19 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  <div class="row grow">
+    <div class="panel grow {% if gate.open %}gate-open{% endif %}" style="flex: 1.3;">
+      <div class="cap"><span>Gate</span><span>{{ gate.window }}</span></div>
+      <div class="body"><div class="xl">{{ gate.status }}</div><div class="sm">{{ gate.headline }}</div><div class="xs">{{ gate.detail }}</div></div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Tides</span><span>{{ days[0].date }}</span></div>
+      <div class="body">{% for t in days[0].tides %}<div class="line"><span class="sm">{{ t.type }}</span><span class="sm tnum">{{ t.time }}</span><span class="xs tnum">{{ t.height }}m</span></div>{% endfor %}</div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Sun</span><span>{{ sun.daylight }}</span></div>
+      <div class="body"><div class="md tnum">&#9650; {{ sun.sunrise }}</div><div class="md tnum">&#9660; {{ sun.sunset }}</div>{% if alert_count > 0 %}<div class="xs clamp2">&#9888; {{ alerts[0].title }}</div>{% endif %}</div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="title_bar"><span class="title">{{ port }}</span><span class="instance">{{ updated }}</span></div>

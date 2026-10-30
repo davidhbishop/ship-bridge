@@ -1,0 +1,18 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  <div class="panel grow">
+    <div class="cap"><span>{{ port }} tide today</span><span>Gate {{ gate.headline | downcase }}</span></div>
+    <div class="body grow" style="padding: 20px 16px 20px;">
+      {% if tide_curve %}
+      <div class="chart">
+        {% for g in tide_curve.gates %}<div class="gatebox" style="left: {{ g.left }}%; width: {{ g.width }}%;"></div>{% endfor %}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path d="{{ tide_curve.line }}" fill="none" stroke="#000" stroke-width="3" vector-effect="non-scaling-stroke"></path></svg>
+        {% if tide_curve.now %}<div class="now" style="left: {{ tide_curve.now.x }}%;"></div>{% endif %}
+        {% for m in tide_curve.marks %}<div class="mk" style="left: {{ m.label_x }}%; top: {{ m.y }}%; margin-top: {% if m.type == 'HW' %}-18px{% else %}3px{% endif %};">{{ m.time }}</div>{% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+</div>
+<div class="title_bar"><span class="title">Tides &middot; {{ port }}</span><span class="instance">{{ updated }}</span></div>

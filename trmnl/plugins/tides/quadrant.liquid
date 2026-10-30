@@ -1,0 +1,9 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  <div class="panel grow">
+    <div class="cap"><span>Tides today</span><span>Gate {{ gate.status | downcase }}</span></div>
+    <div class="body">{% for t in days[0].tides %}<div class="line"><span class="sm">{{ t.type }}</span><span class="sm tnum">{{ t.time }}</span><span class="xs tnum">{{ t.height }}m</span></div>{% endfor %}</div>
+  </div>
+</div>
+</div>
+<div class="title_bar"><span class="title">Tides &middot; {{ port }}</span><span class="instance">{{ updated }}</span></div>

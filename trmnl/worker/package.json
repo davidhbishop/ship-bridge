@@ -1,0 +1,10 @@
+{
+  "name": "trmnl-bridge",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "sample": "node test/run.mjs"
+  }
+}
