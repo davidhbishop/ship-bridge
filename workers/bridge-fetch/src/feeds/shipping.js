@@ -10,13 +10,25 @@ export async function runShipping(env) {
   if (!response.ok) throw new Error(`Met Office shipping ${response.status}`);
   const page = await parseMarinePage(await response.text());
 
-  const areas = page.areas.map(a => ({
-    id: slug(a.name || a.id),
-    name: a.name,
-    warning: a.warning,
-    gale: a.warned || /gale|storm|hurricane/i.test(a.warning),
-    ...period(a.periods[0]),
-  }));
+  // The page repeats some cards (FitzRoy, Sole) and Trafalgar's heading
+  // carries its own issue time, so name areas by the card id and keep one each.
+  const seen = new Set();
+  const areas = [];
+  for (const a of page.areas) {
+    const name = a.id || a.name.replace(/\s*\(.*\)\s*$/, '');
+    const id = slug(name);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    const note = (a.name.match(/\(([^)]*)\)\s*$/) || [])[1] || null;
+    areas.push({
+      id,
+      name,
+      ...(note ? { note } : {}),
+      warning: a.warning,
+      gale: a.warned || /gale|storm|hurricane/i.test(a.warning),
+      ...period(a.periods[0]),
+    });
+  }
   if (!areas.length) throw new Error('shipping: no areas parsed');
 
   const doc = {
