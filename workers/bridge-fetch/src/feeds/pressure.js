@@ -10,6 +10,12 @@ export async function runPressure(env) {
   if (!response.ok) throw new Error(`Met Office pressure ${response.status}`);
   const charts = parseCharts(await response.text());
   if (!charts.length) throw new Error('pressure: no charts parsed');
+  // Later charts are 24 hours apart, so take the lead time from the valid times.
+  const base = charts.find(c => c.step === 0)?.valid_at;
+  for (const c of charts) {
+    c.hours = base && c.valid_at ? Math.round((new Date(c.valid_at) - new Date(base)) / 3600e3) : c.step * 12;
+    c.label = c.hours === 0 ? 'analysis' : `t${c.hours}`;
+  }
 
   const doc = { source: 'metoffice-pressure', fetched_at: iso(new Date()), analysis: null, outlooks: [] };
   for (const chart of charts) {
@@ -32,7 +38,7 @@ export async function runPressure(env) {
 }
 
 // Each chart is an element like id="chartBW0" data-value="18:00 UTC on Thu 29 Oct 2026"
-// wrapping an <img>. The trailing digit is the 12-hour step (0 = analysis).
+// wrapping an <img>. The trailing digit is the chart's position (0 = analysis).
 function parseCharts(html) {
   const charts = [];
   const re = /<[^>]+id="chart(BW|Colour)(\d+)"[^>]*data-value="([^"]+)"[^>]*>[\s\S]*?<img[^>]+src="([^"]+)"/gi;
@@ -45,8 +51,7 @@ function parseCharts(html) {
     const valid = Number.isFinite(day) && month !== undefined ? iso(new Date(Date.UTC(year, month, day, hh, mm))) : null;
     charts.push({
       style: m[1].toLowerCase() === 'bw' ? 'bw' : 'colour',
-      hours: Number(m[2]) * 12,
-      label: Number(m[2]) === 0 ? 'analysis' : `t${Number(m[2]) * 12}`,
+      step: Number(m[2]),
       valid_at: valid,
       url: m[4].startsWith('http') ? m[4] : `https://www.metoffice.gov.uk${m[4]}`,
     });
