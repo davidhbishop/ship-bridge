@@ -1,0 +1,29 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% if chart %}
+  <div class="row grow">
+    <div class="panel fixed" style="height: 100%; aspect-ratio: 891 / 601;">
+      <img class="image" src="{{ chart.url }}" style="width: 100%; height: 100%; object-fit: contain;">
+    </div>
+    <div class="col grow">
+      <div class="panel fixed">
+        <div class="cap"><span>Valid</span></div>
+        <div class="body"><div class="md">{{ chart.valid_day }}</div><div class="xl tnum">{{ chart.valid_time }}</div><div class="sm">{{ chart.valid_utc }}</div><div class="xs muted">{{ chart.lead }} forecast</div></div>
+      </div>
+      {% if charts.size > 1 %}
+      <div class="panel grow">
+        <div class="cap"><span>Later charts</span></div>
+        <div class="body">{% for c in charts offset: 1 %}<div class="line"><span class="sm">{{ c.valid }}</span></div>{% endfor %}</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="panel grow"><div class="body xl" style="padding-top: 120px; text-align: center;">No pressure chart in R2</div></div>
+  {% endif %}
+</div>
+</div>
+<div class="title_bar">
+  <span class="title">Surface pressure</span>
+  <span class="instance">Met Office &middot; updated {{ updated }}</span>
+</div>

@@ -1,0 +1,8 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% for a in alerts limit: 2 %}
+  <div class="alert {{ a.level }} {% if forloop.first %}grow{% endif %}"><span class="mark">{% if a.level == 'warning' %}&#9888;{% else %}!{% endif %}</span><div class="grow"><div class="lg clip">{{ a.title }}</div><div class="sm clamp2">{{ a.detail }}</div></div></div>
+  {% else %}<div class="panel grow"><div class="body lg">No alerts</div></div>{% endfor %}
+</div>
+</div>
+<div class="title_bar"><span class="title">Boat alerts</span><span class="instance">{{ alert_count }} active</span></div>

@@ -1,0 +1,47 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  <div class="panel fixed" style="height: 200px;">
+    <div class="cap"><span>{{ port }} tide today</span><span>shaded = gate open &middot; {{ gate.headline }}</span></div>
+    <div class="body grow" style="padding: 22px 18px 22px 18px;">
+      {% if tide_curve %}
+      <div class="chart">
+        {% for g in tide_curve.gates %}<div class="gatebox" style="left: {{ g.left }}%; width: {{ g.width }}%;"></div>{% endfor %}
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                    <path d="{{ tide_curve.line }}" fill="none" stroke="#000" stroke-width="3" vector-effect="non-scaling-stroke"></path>
+        </svg>
+        {% if tide_curve.now %}<div class="now" style="left: {{ tide_curve.now.x }}%;"></div>{% endif %}
+        {% for m in tide_curve.marks %}
+          {% if m.type == 'HW' %}
+          <div class="mk" style="left: {{ m.label_x }}%; top: {{ m.y }}%; margin-top: -20px;">{{ m.time }} {{ m.height }}m</div>
+          {% else %}
+          <div class="mk" style="left: {{ m.label_x }}%; top: {{ m.y }}%; margin-top: 4px;">{{ m.time }} {{ m.height }}m</div>
+          {% endif %}
+        {% endfor %}
+        <span class="tick" style="left: 0%;">00</span><span class="tick" style="left: 25%;">06</span><span class="tick" style="left: 50%;">12</span><span class="tick" style="left: 75%;">18</span><span class="tick" style="left: 100%;">24</span>
+      </div>
+      {% else %}<div class="md">Not enough tide data to draw today's curve</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="row grow">
+    {% for d in days %}
+    <div class="panel grow">
+      <div class="cap"><span>{{ d.label }}</span><span>{{ d.date }}</span></div>
+      <div class="body">
+        {% for t in d.tides %}
+        <div class="line"><span class="sm"><span class="tag {% if t.type == 'HW' %}solid{% endif %}">{{ t.type }}</span></span><span class="md tnum">{{ t.time }}</span><span class="sm tnum">{{ t.height }}m</span></div>
+        {% endfor %}
+        {% for g in d.gates %}
+        <div class="xs tnum clip">Gate {{ g.open }}&ndash;{{ g.close }} (HW {{ g.hw }})</div>
+        {% endfor %}
+        <div class="xs tnum muted clip">&#9650; {{ d.sunrise }} &#9660; {{ d.sunset }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</div>
+<div class="title_bar">
+  <span class="title">Tides &amp; gate &middot; {{ port }}</span>
+  <span class="instance">Gate {{ gate.status | downcase }} &middot; updated {{ updated }}</span>
+</div>

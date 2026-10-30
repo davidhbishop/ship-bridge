@@ -1,0 +1,14 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% for d in days limit: 2 %}
+  <div class="panel grow">
+    <div class="cap"><span>{{ d.label }}</span><span>{{ d.date }}</span></div>
+    <div class="body">
+      {% for t in d.tides %}<div class="line"><span class="md">{{ t.type }}</span><span class="md tnum">{{ t.time }}</span><span class="sm tnum">{{ t.height }}m</span></div>{% endfor %}
+      {% for g in d.gates %}<div class="xs tnum">Gate {{ g.open }}&ndash;{{ g.close }}</div>{% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+</div>
+</div>
+<div class="title_bar"><span class="title">Tides &middot; {{ port }}</span><span class="instance">{{ updated }}</span></div>
