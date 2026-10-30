@@ -1,0 +1,15 @@
+name = "bridge-fetch"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+[triggers]
+crons = ["* * * * *"]
+
+[[r2_buckets]]
+binding = "FORECAST"
+bucket_name = "forecast"
+
+# Secrets (wrangler secret put): API_KEY, ADMIRALTY_KEY, DATAHUB_KEY
+
+[observability]
+enabled = true
