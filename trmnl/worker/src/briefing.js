@@ -279,7 +279,9 @@ const TIDE_CYCLE = (12 * 60 + 25) * 60 * 1000;
  * chart box (x left to right, y top to bottom) so the markup can draw the
  * line in a stretched SVG and place labels with plain CSS.
  */
-function tideCurve(extremes, gates, dayStart, now) {
+function tideCurve(allExtremes, gates, dayStart, now) {
+  // Records recovered without a height can't be drawn; the cycle fallback covers them.
+  const extremes = allExtremes.filter((e) => e.height !== null);
   const dayEnd = dayStart + DAY;
   const inside = extremes.filter((e) => e.at > dayStart && e.at < dayEnd);
   let before = extremes.filter((e) => e.at <= dayStart).slice(-1);
