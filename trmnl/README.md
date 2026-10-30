@@ -21,6 +21,7 @@ R2 bucket "forecast"  ──►  trmnl-bridge worker  ──►  TRMNL private p
 | Boat · Tides & gate | `/tides` | Today's tide curve with gate windows shaded and a "now" line, then a three day HW/LW and gate table |
 | Boat · Inshore forecast | `/forecast` | Area 11 (Great Orme Head to the Mull of Galloway) wind, sea, weather and visibility in large type for copying into the log |
 | Boat · Alerts | `/alerts` | Only appears in the playlist when there is something to say (it sets `show: false` otherwise and the screen is skipped) |
+| Boat · Shipping forecast | `/forecast` (plugin merge) | Irish Sea wind, sea, weather and visibility for the log, the general synopsis, and Malin and Lundy alongside. Reads the `shipping` block that the Inshore forecast plugin already fetches, through TRMNL's plugin merge, so it needs no key of its own |
 | Boat · Pressure | `/pressure` | The Met Office surface pressure chart for the next 00:00 or 12:00 UTC, with the later charts listed |
 
 Every plugin has full, half horizontal, half vertical and quadrant layouts, so they
@@ -58,6 +59,8 @@ Built in `worker/src/briefing.js` (`buildAlerts`):
 
 - **Warning**: Met Office warning text on the area (e.g. "Gale warning issued"), any
   forecast wind of gale force 8 or more, or no tide data at all.
+- A gale (or Met Office warning) in the Irish Sea shipping area also raises a
+  warning when the inshore forecast has not already.
 - **Caution**: strong wind (force 6+, `STRONG_WIND_FORCE`), rough sea, poor visibility
   or fog, gate closing within 90 minutes (`GATE_WARN_MINUTES`), forecast not updated
   today, forecast missing.
@@ -73,10 +76,10 @@ worker. Change these in `wrangler.toml` if the marina's sill times differ.
 
 ## Time zones
 
-All times shown are Europe/London. The tidal worker currently stores tide times as
-UTC+1 all year round (it hard-codes BST), so the bridge undoes that with
-`TIDE_STORED_OFFSET = "1"`. When the tidal worker is fixed to store real local
-time, set it to `"local"`. Sunrise and sunset from tidetimes.org.uk are already local.
+All times shown are Europe/London. Tide and gate records carry an `at` UTC
+timestamp, which the bridge uses when present. Older records without it are read as
+local time (`TIDE_STORED_OFFSET = "local"`); set a number of hours instead if a
+feed stores a fixed offset. Sunrise and sunset from tidetimes.org.uk are already local.
 
 ## Deploying the worker
 
@@ -106,5 +109,6 @@ preview the markup.
 ## Markup
 
 `plugins/shared.css.liquid` is the shared stylesheet, pasted into each plugin's
-shared markup (Alerts adds `plugins/alerts/shared.liquid` for the skip). Each
+shared markup (Alerts adds `plugins/alerts/shared.liquid` for the skip, and Shipping forecast
+`plugins/shipping/shared.liquid` for its plugin merge). Each
 `plugins/<name>/<size>.liquid` is the markup for that size.

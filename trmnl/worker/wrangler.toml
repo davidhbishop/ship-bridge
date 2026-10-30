@@ -11,8 +11,8 @@ bucket_name = "forecast"
 PORT_NAME = "Conwy"
 FORECAST_AREA = "11"
 INSHORE_AREAS = "9,10,11"
-# The tidal worker stores tide times as UTC+1 all year. Set to "local" once it writes Europe/London times.
-TIDE_STORED_OFFSET = "1"
+# Only for tide records without an `at` UTC time: "local", or the fixed hours ahead of UTC they were stored in.
+TIDE_STORED_OFFSET = "local"
 GATE_OPEN_HOURS = "-2"
 GATE_CLOSE_HOURS = "3"
 STRONG_WIND_FORCE = "6"

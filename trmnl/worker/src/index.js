@@ -6,9 +6,11 @@
  * Routes (all need the X-Api-Key header, or ?key= for testing in a browser):
  *   /morning   everything for the wake-up screen
  *   /tides     three day tide and gate table with today's tide curve
- *   /forecast  inshore waters forecast for the home area, or ?area=N
+ *   /forecast  inshore waters forecast for the home area, or ?area=N, plus the
+ *              shipping forecast (the Shipping forecast plugin polls this too)
  *   /alerts    active alerts only; show=false when there is nothing to say
  *   /pressure  the next Met Office pressure charts, with image links
+ *   /shipping  shipping forecast for the Irish Sea and its neighbours, or ?area=<id>
  *
  * /pressure/YYYYMMDD/HHMM.gif serves a chart image without a key: TRMNL fetches
  * images without headers, and the charts are public Met Office data anyway.
@@ -16,6 +18,7 @@
 
 import { buildBriefing } from "./briefing.js";
 import { pressureCharts, pressureImage } from "./pressure.js";
+import { shippingForecast } from "./shipping.js";
 
 export default {
   async fetch(request, env) {
@@ -39,12 +42,17 @@ export default {
       return json({ updated: new Date().toLocaleTimeString("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit" }), ...charts });
     }
 
+    if (route === "/shipping") {
+      const shipping = await shippingForecast(env, new Date(), { area: url.searchParams.get("area") });
+      return json({ updated: new Date().toLocaleTimeString("en-GB", { timeZone: "Europe/London", hour: "2-digit", minute: "2-digit" }), shipping });
+    }
+
     const briefing = await buildBriefing(env, new Date(), { area: url.searchParams.get("area") });
 
     const views = {
       "/morning": () => briefing,
       "/tides": () => pick(briefing, ["updated", "port", "gate", "tide_curve", "days", "alerts", "alert_count", "alert_level"]),
-      "/forecast": () => pick(briefing, ["updated", "inshore_areas", "forecast", "alerts", "alert_count", "alert_level"]),
+      "/forecast": () => pick(briefing, ["updated", "inshore_areas", "forecast", "shipping", "alerts", "alert_count", "alert_level"]),
       "/alerts": () => ({ ...pick(briefing, ["updated", "port", "alerts", "alert_count", "alert_level", "gate"]), show: briefing.alert_count > 0 }),
     };
 

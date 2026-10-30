@@ -11,6 +11,8 @@
  * day folder an event was filed under, and all times shown are Europe/London.
  */
 
+import { shippingForecast } from "./shipping.js";
+
 const ZONE = "Europe/London";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -30,6 +32,7 @@ export async function buildBriefing(env, now, options = {}) {
   const gates = gateWindows(extremes, config);
 
   const forecast = await readForecast(env, config, today);
+  const shipping = await shippingForecast(env, now).catch(() => ({ known: false }));
   const gate = config.hasGate
     ? gateStatus(gates, now, extremes.length > 0)
     : { known: false, status: "NO GATE", headline: "No gate here", detail: "" };
@@ -38,7 +41,7 @@ export async function buildBriefing(env, now, options = {}) {
   const sun = sunView(days[0], events, now, todayStart);
   const nextTide = extremes.find((e) => e.at > now.getTime());
 
-  const alerts = buildAlerts({ forecast, gate, extremes, config });
+  const alerts = buildAlerts({ forecast, shipping, gate, extremes, config });
   const level = alerts.length ? alerts[0].level : "none";
 
   return {
@@ -52,6 +55,7 @@ export async function buildBriefing(env, now, options = {}) {
     days,
     tide_curve: tideCurve(extremes, gates, todayStart, now),
     forecast,
+    shipping,
     alerts,
     alert_count: alerts.length,
     alert_level: level,
@@ -127,9 +131,12 @@ function normaliseEvents(records, config) {
 
     const [y, m, d] = [r._folder.slice(0, 4), r._folder.slice(4, 6), r._folder.slice(6, 8)].map(Number);
     const isTide = type === "HW" || type === "LW";
-    const at = isTide && config.tideOffset !== "local"
-      ? Date.UTC(y, m - 1, d, clock.h, clock.mi) - config.tideOffset * HOUR
-      : fromLocal(y, m, d, clock.h, clock.mi);
+    // Newer records carry the UTC instant; older ones only a clock time.
+    const at = r.at && !Number.isNaN(Date.parse(r.at))
+      ? Date.parse(r.at)
+      : isTide && config.tideOffset !== "local"
+        ? Date.UTC(y, m - 1, d, clock.h, clock.mi) - config.tideOffset * HOUR
+        : fromLocal(y, m, d, clock.h, clock.mi);
 
     const key = `${type}@${at}`;
     if (seen.has(key)) continue;
@@ -263,6 +270,9 @@ function sunView(day, events, now, todayStart) {
 
 // ---------------------------------------------------------------- tide curve
 
+// Semi-diurnal tide: high waters come round about every 12h 25m.
+const TIDE_CYCLE = (12 * 60 + 25) * 60 * 1000;
+
 /**
  * Today's tide curve, sampled every 15 minutes using cosine interpolation
  * between successive high and low waters. Coordinates are percentages of the
@@ -271,9 +281,13 @@ function sunView(day, events, now, todayStart) {
  */
 function tideCurve(extremes, gates, dayStart, now) {
   const dayEnd = dayStart + DAY;
-  const before = extremes.filter((e) => e.at <= dayStart).slice(-1);
-  const after = extremes.filter((e) => e.at >= dayEnd).slice(0, 1);
-  const span = [...before, ...extremes.filter((e) => e.at > dayStart && e.at < dayEnd), ...after];
+  const inside = extremes.filter((e) => e.at > dayStart && e.at < dayEnd);
+  let before = extremes.filter((e) => e.at <= dayStart).slice(-1);
+  let after = extremes.filter((e) => e.at >= dayEnd).slice(0, 1);
+  // A neighbouring day's file can be missing; borrow the tide one cycle on.
+  if (!before.length && inside.length > 1) before = [{ ...inside[1], at: inside[1].at - TIDE_CYCLE }];
+  if (!after.length && inside.length > 1) after = [{ ...inside[inside.length - 2], at: inside[inside.length - 2].at + TIDE_CYCLE }];
+  const span = [...before, ...inside, ...after];
   if (span.length < 2 || span[0].at > dayStart || span[span.length - 1].at < dayEnd) return null;
   if (span.some((e) => e.height === null)) return null;
 
@@ -368,7 +382,7 @@ export function maxForce(text) {
 
 const RANK = { warning: 0, caution: 1, info: 2 };
 
-function buildAlerts({ forecast, gate, extremes, config }) {
+function buildAlerts({ forecast, shipping, gate, extremes, config }) {
   const alerts = [];
   const add = (level, title, detail) => alerts.push({ level, icon: level === "warning" ? "!" : "i", title, detail });
 
@@ -387,6 +401,12 @@ function buildAlerts({ forecast, gate, extremes, config }) {
     if (forecast.stale) add("caution", "Forecast not updated today", `Showing ${forecast.issued}. Check the inshore worker.`);
   } else {
     add("caution", "No inshore forecast", "Nothing in R2 for today or yesterday");
+  }
+
+  // The shipping forecast covers the open sea beyond the inshore area.
+  const sea = shipping && shipping.known ? shipping.area : null;
+  if (sea && (sea.gale || sea.warning) && !alerts.some((a) => a.level === "warning")) {
+    add("warning", `Gale warning: ${sea.name}`, sea.warning || sea.wind);
   }
 
   if (!extremes.length) {
