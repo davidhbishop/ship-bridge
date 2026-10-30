@@ -53,7 +53,9 @@ export async function saveSettings(settings: Settings): Promise<{ settings: Sett
   const body = (await response.json().catch(() => null)) as Record<string, unknown> | null
   if (!response.ok) {
     const message = body && typeof body.error === 'string' ? body.error : `Settings API answered ${response.status}`
-    throw new Error(message)
+    // A 400 also lists the problem with each field.
+    const details = Array.isArray(body?.errors) ? body.errors.filter((e): e is string => typeof e === 'string') : []
+    throw new Error(details.length ? `${message}: ${details.join('; ')}` : message)
   }
   const saved = (body?.settings ?? body) as Settings
   return { settings: validateSettings(saved), nextFetchAt: typeof body?.next_fetch_at === 'string' ? body.next_fetch_at : undefined }
