@@ -1,0 +1,15 @@
+{
+  "name": "ship-bridge-workers",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild bridge-fetch/src/index.js --bundle --format=esm --outfile=dist/bridge-fetch.js && esbuild bridge-api/src/index.js --bundle --format=esm --outfile=dist/bridge-api.js",
+    "deploy:fetch": "wrangler deploy -c bridge-fetch/wrangler.toml",
+    "deploy:api": "wrangler deploy -c bridge-api/wrangler.toml",
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "type": "module",
+  "private": "true"
+}
