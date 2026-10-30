@@ -73,7 +73,7 @@ export function buildDoc(port, raw, now = new Date()) {
   };
 }
 
-function legacyGroups(port, doc, days) {
+export function legacyGroups(port, doc, days) {
   const byDay = new Map();
   const add = (ymd, rec) => {
     if (!byDay.has(ymd)) byDay.set(ymd, []);
@@ -88,11 +88,13 @@ function legacyGroups(port, doc, days) {
     add(g.date.replaceAll('-', ''), { time: g.local, event_type: type, type, at: g.at });
   }
 
-  // The API window starts part way through today, so keep earlier records.
-  const firstAt = doc.events[0]?.at;
+  // The API window starts part way through today, and gates can open the
+  // evening before the first HW, so keep every record earlier than the window.
+  const firstAt = [doc.events[0]?.at, doc.gates[0]?.at].filter(Boolean).sort()[0];
   const first = firstAt ? london(new Date(firstAt)) : null;
   for (const [ymd, records] of byDay) {
-    const keep = first && ymd === first.ymd ? r => String(r.time) < first.local : () => false;
+    const keep = !first ? () => false
+      : r => (r.at ? r.at < firstAt : ymd < first.ymd || (ymd === first.ymd && String(r.time) < first.local));
     if (!days.has(ymd)) days.set(ymd, []);
     days.get(ymd).push({ name: legacyName(port), types: LEGACY_TYPES, records, keep });
   }
