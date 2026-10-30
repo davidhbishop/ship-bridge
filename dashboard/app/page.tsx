@@ -1,12 +1,11 @@
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { AutoRefresh } from '@/components/AutoRefresh'
 import { CopyButton } from '@/components/CopyButton'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { TideChart } from '@/components/TideChart'
 import { buildAlerts } from '@/lib/alerts'
-import { SESSION_COOKIE, verifySession } from '@/lib/auth'
-import { config, isDemo, loadDay } from '@/lib/data'
+import { hasSession } from '@/lib/session'
+import { isDemo, loadDay, loadSettings } from '@/lib/data'
 import { gateOpenAt, gateWindows, logText } from '@/lib/forecast'
 import type { Morning, SeaForecast } from '@/lib/morning'
 import { addDays, formatDateKey, formatDuration, formatTime, londonDateKey, londonMinutes, toMinutes } from '@/lib/time'
@@ -46,10 +45,7 @@ function Sea({ forecast }: { forecast: SeaForecast }) {
 }
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ day?: string }> }) {
-  // proxy.ts already guards this page; check again here so the data is never
-  // rendered without a session even if the proxy matcher changes.
-  const store = await cookies()
-  if (!(await verifySession(store.get(SESSION_COOKIE)?.value))) redirect('/login')
+  if (!(await hasSession())) redirect('/login')
 
   const { day: dayParam } = await searchParams
   const offset = Math.min(Math.max(Number(dayParam) || 0, 0), DAYS.length - 1)
@@ -57,11 +53,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
   const dateKey = londonDateKey(addDays(now, offset))
   const nowMinutes = offset === 0 ? londonMinutes(now) : null
 
+  const { settings, error: settingsError } = await loadSettings()
+  const home = settings.ports.find((p) => p.id === settings.home_port) ?? settings.ports[0]
   const [{ day, error }, nextDay] = await Promise.all([
-    loadDay(dateKey, offset),
-    loadDay(londonDateKey(addDays(now, offset + 1)), offset + 1),
+    loadDay(dateKey, offset, settings),
+    loadDay(londonDateKey(addDays(now, offset + 1)), offset + 1, settings),
   ])
-  const alerts = buildAlerts({ today: day, nowMinutes, error, demo: isDemo })
+  const alerts = buildAlerts({ today: day, nowMinutes, error: error ?? settingsError, demo: isDemo })
+  const otherPorts = (day?.ports ?? []).filter((p) => p.id !== home.id && p.tides.length > 0)
   const windows = day ? gateWindows(day.gates) : []
   const list = day ? events(day) : []
   const nextIndex = nowMinutes === null ? -1 : list.findIndex((e) => (toMinutes(e.time) ?? 0) >= nowMinutes)
@@ -100,7 +99,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
       <AutoRefresh />
       <header className="header">
         <div>
-          <h1>{config.port}</h1>
+          <h1>{home.name}</h1>
           <div className="sub">
             {formatDateKey(dateKey)}
             {nowMinutes !== null && ` · ${formatTime(String(Math.floor(nowMinutes / 60)).padStart(2, '0') + ':' + String(nowMinutes % 60).padStart(2, '0'))} UK time`}
@@ -112,6 +111,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
               {label}
             </a>
           ))}
+          <a className="chip" href="/settings">
+            Settings
+          </a>
           <ThemeToggle />
           <form action="/logout" method="post">
             <button type="submit" className="chip">
@@ -138,7 +140,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
             <div className="hero">
               {nowMinutes !== null && day.gates.length > 0 && (
                 <div className="stat">
-                  <div className="label">Conwy gate</div>
+                  <div className="label">{home.name} gate</div>
                   <div className={`value ${gateOpen ? 'open' : 'closed'}`}>{gateOpen ? 'Open' : 'Closed'}</div>
                   {gateChange && (
                     <div className="note">
@@ -225,6 +227,31 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
             </div>
             {day.daylight.moon_phase && <p style={{ marginBottom: 0 }}>Moon: {day.daylight.moon_phase}</p>}
           </section>
+
+          {otherPorts.length > 0 && (
+            <section className="card span-12">
+              <h2>Other ports</h2>
+              <div className="ports">
+                {otherPorts.map((port) => (
+                  <div key={port.id} className="port">
+                    <h3>{port.name}</h3>
+                    <ul className="events compact">
+                      {port.tides.map((t, i) => {
+                        const past = nowMinutes !== null && (toMinutes(t.local) ?? 0) < nowMinutes
+                        return (
+                          <li key={i} className={past ? 'past' : undefined}>
+                            <span className="time">{formatTime(t.local)}</span>
+                            <span>{t.type === 'high' ? 'HW' : 'LW'}</span>
+                            <span className="extra">{t.height_m !== null ? `${t.height_m.toFixed(1)} m` : ''}</span>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {shipping && (
             <section className="card span-6">

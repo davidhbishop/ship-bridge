@@ -19,7 +19,11 @@ const records = [
 ]
 
 test('data.json adapter dedupes, filters and corrects winter tide times', () => {
-  const day = fromDataJson('20261030', records, 'Conwy', ['10'])
+  const ports = [
+    { id: 'conwy', name: 'Conwy', station: '0471A', gate: null },
+    { id: 'holyhead', name: 'Holyhead', station: '0478', gate: null },
+  ]
+  const day = fromDataJson('20261030', records, ports, 'conwy', [10])
   assert.deepEqual(day.tides.map((t) => [t.type, t.local, t.height_m]), [
     ['low', '03:03', 1.1],
     ['high', '08:40', 7.8],
@@ -28,11 +32,13 @@ test('data.json adapter dedupes, filters and corrects winter tide times', () => 
   assert.equal(day.daylight.sunrise, '07:13') // scraped local time, not shifted
   assert.equal(day.daylight.moon_phase, 'Full Moon')
   assert.deepEqual(day.inshore?.areas.map((a) => a.id), ['10'])
+  assert.deepEqual(day.ports?.find((p) => p.id === 'holyhead')?.tides.map((t) => t.local), ['08:00'])
+  assert.equal(day.ports?.find((p) => p.id === 'conwy')?.tides.length, 2)
 })
 
 test('no tide correction in summer', () => {
   assert.equal(londonOffsetMinutes('20260701'), 60)
-  const day = fromDataJson('20260701', records, 'Conwy', [])
+  const day = fromDataJson('20260701', records, [], 'conwy', [])
   assert.equal(day.tides[0].local, '04:03')
 })
 
@@ -68,4 +74,27 @@ test('session cookies verify, expire and reject tampering', async () => {
   assert.equal(safeEqual('abc', 'abc'), true)
   assert.equal(safeEqual('abc', 'abd'), false)
   assert.equal(safeEqual('abc', 'abcd'), false)
+})
+
+import { validateSettings, DEFAULT_SETTINGS, SettingsError } from './settings.ts'
+
+test('settings validation tidies input and rejects bad ports', () => {
+  const ok = validateSettings({
+    home_port: 'holyhead',
+    inshore_areas: ['11', 9, '9', 99],
+    ports: [
+      { name: 'Conwy', station: '0471a', gate: { open_h: '-2', close_h: '3' } },
+      { name: 'Holyhead', station: '0478', gate: null },
+      { name: '', station: '' },
+    ],
+  })
+  assert.deepEqual(ok.inshore_areas, [9, 11])
+  assert.equal(ok.home_port, 'holyhead')
+  assert.equal(ok.ports[0].station, '0471A')
+  assert.deepEqual(ok.ports[0].gate, { open_h: -2, close_h: 3 })
+  assert.equal(ok.ports.filter((p) => p.home).length, 1)
+  assert.deepEqual(validateSettings(DEFAULT_SETTINGS).ports.map((p) => p.id), DEFAULT_SETTINGS.ports.map((p) => p.id))
+  assert.throws(() => validateSettings({ ...DEFAULT_SETTINGS, inshore_areas: [] }), SettingsError)
+  assert.throws(() => validateSettings({ ...DEFAULT_SETTINGS, ports: [{ name: 'X', station: 'abc', gate: null }] }), /station id/)
+  assert.throws(() => validateSettings({ ...DEFAULT_SETTINGS, ports: [{ name: 'X', station: '0001', gate: { open_h: 3, close_h: -2 } }] }), /open before/)
 })

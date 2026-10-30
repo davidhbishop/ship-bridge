@@ -12,6 +12,15 @@ It shows, for Conwy:
 - alerts for gale and strong wind warnings, force 6+ winds, poor visibility,
   the gate closing within two hours, and missing data
 
+- tide times at the other ports in your list, for passage planning
+
+The `/settings` page sets which Met Office inshore areas to show (9, 10 and 11
+by default), the home port, and the list of tidal ports. Ports can be found by
+name from the Admiralty station list or added by station id, and any port can
+have a tidal gate (Conwy opens HW -2h and closes HW +3h). Settings are saved
+through bridge-api (`GET`/`PUT /v1/settings`) to R2 at `config/settings.json`,
+which the workers and the TRMNL screens also read.
+
 Today, tomorrow and the day after can be viewed. The page refreshes every five
 minutes and whenever the phone wakes. The colour scheme follows the device, or
 can be set to day, dark, or a red-only night mode that keeps night vision.
@@ -23,11 +32,12 @@ The dashboard reads from the Cloudflare workers, server-side, sending
 
 - `FORECAST_API_MODE=morning` (default): `GET {FORECAST_API_URL}/v1/morning?date=YYYYMMDD`
   on the `bridge-api` worker (see `lib/morning.ts` for the shape).
+- `GET /v1/settings`, `PUT /v1/settings` and `GET /v1/stations?q=` for the settings page.
 - `FORECAST_API_MODE=datajson`: `GET {FORECAST_API_URL}?date=YYYYMMDD` returning the raw
   R2 `YYYYMMDD/data.json` array. Tide and gate times there are written as UTC + 1 hour all
   year by the current tidal worker; `LEGACY_TIDE_FIX=true` corrects that in winter.
 
-With no `FORECAST_API_URL` set, the dashboard shows sample data.
+With no `FORECAST_API_URL` set, the dashboard shows sample data and keeps settings in memory.
 
 ## Password protection
 

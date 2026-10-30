@@ -445,3 +445,104 @@ button {
 .stat .value {
   white-space: nowrap;
 }
+
+.ports {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+}
+
+.events.compact li {
+  grid-template-columns: 3.5rem 2rem auto;
+  padding: 4px 0;
+}
+
+.events.compact .time {
+  font-size: 1rem;
+}
+
+.settings fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0 0 20px;
+}
+
+.settings legend {
+  font-weight: 650;
+  margin-bottom: 8px;
+}
+
+.checks {
+  display: grid;
+  gap: 6px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.checks label {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.port-row {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 1fr 6rem;
+  align-items: end;
+  padding: 12px 0;
+  border-top: 1px solid var(--border);
+}
+
+.port-row .gate {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  grid-column: 1 / -1;
+}
+
+.settings input[type='text'],
+.settings input[type='number'],
+.settings input[type='search'] {
+  font: inherit;
+  font-size: 16px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.settings input[type='number'] {
+  width: 4.5rem;
+}
+
+.settings label.field {
+  display: grid;
+  gap: 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.results {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.results li button {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  cursor: pointer;
+  margin-bottom: 4px;
+}
+
+.saved {
+  color: var(--ok);
+}

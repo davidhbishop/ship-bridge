@@ -24,8 +24,10 @@ export type Morning = {
   inshore?: {
     issued?: string
     general_situation?: string
-    areas: { id: string; name: string; warning?: string; next_24h?: SeaForecast; outlook?: SeaForecast | string }[]
+    areas: { id: string | number; name: string; warning?: string; next_24h?: SeaForecast; outlook?: SeaForecast | string }[]
   } | null
+  // Tides at every port in settings, for passage planning.
+  ports?: { id: string; name: string; station?: string; tides: Morning['tides'] }[]
   alerts?: { level?: string; code?: string; title: string; detail?: string; source?: string }[]
   stale?: Record<string, unknown>
 }

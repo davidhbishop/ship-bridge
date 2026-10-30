@@ -2,11 +2,24 @@
 // the Conwy files in data/forecast/20230416, moved ~50 minutes a day.
 
 import type { Morning } from './morning.ts'
+import type { Settings } from './settings.ts'
 import { shiftTime } from './time.ts'
 
-export function sampleMorning(date: string, dayOffset: number): Morning {
+export function sampleMorning(date: string, dayOffset: number, settings: Settings): Morning {
   const t = (time: string) => shiftTime(time, dayOffset * 50)
-  return {
+  // Other ports: the same tide moved by a made-up per-port offset.
+  const ports = settings.ports.map((port, i) => ({
+    id: port.id,
+    name: port.name,
+    station: port.station,
+    tides: [
+      { type: 'low' as const, local: shiftTime(t('03:03'), i * 23 - 40), height_m: 0.9 + i * 0.2 },
+      { type: 'high' as const, local: shiftTime(t('08:40'), i * 23 - 40), height_m: 5.4 + i * 0.6 },
+      { type: 'low' as const, local: shiftTime(t('15:38'), i * 23 - 40), height_m: 1.1 + i * 0.2 },
+      { type: 'high' as const, local: shiftTime(t('21:29'), i * 23 - 40), height_m: 5.2 + i * 0.6 },
+    ],
+  }))
+  const morning: Morning = {
     date,
     generated_at: new Date().toISOString(),
     tides: [
@@ -39,7 +52,18 @@ export function sampleMorning(date: string, dayOffset: number): Morning {
       general_situation: 'Low pressure moving northeast across the Irish Sea, filling.',
       areas: [
         {
-          id: '10',
+          id: 9,
+          name: "Land's End to St David's Head including the Bristol Channel",
+          warning: '',
+          next_24h: {
+            wind: 'West 3 to 5.',
+            sea: 'Slight or moderate.',
+            weather: 'Fair.',
+            visibility: 'Good.',
+          },
+        },
+        {
+          id: 10,
           name: "St David's Head to Great Orme Head, including St George's Channel",
           warning: '',
           next_24h: {
@@ -51,7 +75,7 @@ export function sampleMorning(date: string, dayOffset: number): Morning {
           outlook: 'West 5 or 6, decreasing 4. Moderate. Showers. Good.',
         },
         {
-          id: '11',
+          id: 11,
           name: 'Great Orme Head to the Mull of Galloway',
           warning: 'Strong winds are forecast',
           next_24h: {
@@ -63,5 +87,8 @@ export function sampleMorning(date: string, dayOffset: number): Morning {
         },
       ],
     },
+    ports,
   }
+  morning.inshore!.areas = morning.inshore!.areas.filter((a) => settings.inshore_areas.includes(Number(a.id)))
+  return morning
 }

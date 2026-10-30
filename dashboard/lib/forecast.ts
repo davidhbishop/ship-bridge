@@ -3,6 +3,7 @@
 // and holds the helpers the dashboard uses on either source.
 
 import type { Morning, SeaForecast } from './morning.ts'
+import { portId, type Port } from './settings.ts'
 import { formatTime, londonOffsetMinutes, shiftTime, toMinutes } from './time.ts'
 
 export type RawRecord = {
@@ -42,8 +43,9 @@ function dedupe(records: RawRecord[]): RawRecord[] {
 export function fromDataJson(
   date: string,
   records: RawRecord[],
-  port: string,
-  areas: string[],
+  ports: Port[],
+  homePort: string,
+  areas: number[],
   tideFix = true,
 ): Morning {
   const tideShift = tideFix ? londonOffsetMinutes(date) - 60 : 0
@@ -53,6 +55,7 @@ export function fromDataJson(
     gates: [],
     daylight: {},
     inshore: { areas: [] },
+    ports: ports.map((p) => ({ id: p.id, name: p.name, station: p.station, tides: [] })),
   }
 
   for (const record of dedupe(Array.isArray(records) ? records : [])) {
@@ -62,7 +65,7 @@ export function fromDataJson(
 
     if (name === 'inshore-forecast') {
       const id = text(record.event_type)
-      if (areas.length && !areas.includes(id)) continue
+      if (areas.length && !areas.includes(Number(id))) continue
       morning.inshore!.areas.push({
         id,
         name: text(record.area),
@@ -72,9 +75,16 @@ export function fromDataJson(
       continue
     }
 
-    if (name !== port.toLowerCase() || toMinutes(time) === null) continue
+    if (toMinutes(time) === null) continue
     const local = formatTime(time)
     const tideLocal = shiftTime(local, tideShift)
+
+    const other = morning.ports!.find((p) => p.id === portId(name))
+    if (other && (type === 'highwater' || type === 'lowwater')) {
+      const height = Number(record.depth)
+      other.tides.push({ type: type === 'highwater' ? 'high' : 'low', local: tideLocal, height_m: Number.isFinite(height) ? height : null })
+    }
+    if (portId(name) !== homePort) continue
 
     switch (type) {
       case 'highwater':
@@ -106,6 +116,7 @@ export function fromDataJson(
   morning.tides.sort(byLocal)
   morning.gates.sort(byLocal)
   morning.inshore!.areas.sort((a, b) => Number(a.id) - Number(b.id))
+  for (const port of morning.ports!) port.tides.sort(byLocal)
   return morning
 }
 
@@ -118,6 +129,10 @@ export function normaliseMorning(date: string, value: Partial<Morning>): Morning
     gates: [...(value.gates ?? [])].filter((g) => toMinutes(g.local ?? '') !== null).sort(byLocal),
     daylight: value.daylight ?? {},
     inshore: value.inshore ? { ...value.inshore, areas: value.inshore.areas ?? [] } : null,
+    ports: (value.ports ?? []).map((p) => ({
+      ...p,
+      tides: [...(p.tides ?? [])].filter((t) => toMinutes(t.local ?? '') !== null).sort(byLocal),
+    })),
   }
 }
 
