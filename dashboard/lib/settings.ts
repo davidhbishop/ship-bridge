@@ -8,6 +8,9 @@ export type Port = {
   station: string
   gate: { open_h: number; close_h: number } | null
   home?: boolean
+  // Filled in by bridge-api from the station list.
+  lat?: number
+  lon?: number
 }
 
 export type Settings = {
@@ -85,7 +88,9 @@ export function validateSettings(input: unknown): Settings {
     if (ports.some((p) => p.id === id)) throw new SettingsError(`${name} is listed twice`)
     const gate = raw?.gate ? { open_h: hours(raw.gate.open_h, `${name} gate open`), close_h: hours(raw.gate.close_h, `${name} gate close`) } : null
     if (gate && gate.open_h >= gate.close_h) throw new SettingsError(`${name}: gate must open before it closes`)
-    ports.push({ id, name, station, gate })
+    const port: Port = { id, name, station, gate }
+    if (typeof raw?.lat === 'number' && typeof raw?.lon === 'number') Object.assign(port, { lat: raw.lat, lon: raw.lon })
+    ports.push(port)
   }
   if (ports.length === 0) throw new SettingsError('Add at least one tidal port')
   if (ports.length > 12) throw new SettingsError('Up to 12 tidal ports')

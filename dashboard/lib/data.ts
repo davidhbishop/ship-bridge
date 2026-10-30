@@ -37,7 +37,8 @@ export async function loadSettings(): Promise<{ settings: Settings; error: strin
     const response = await api('/v1/settings', { next: { revalidate: 60, tags: ['settings'] } })
     if (response.status === 404) return { settings: DEFAULT_SETTINGS, error: null }
     if (!response.ok) throw new Error(`Settings API answered ${response.status}`)
-    return { settings: validateSettings(await response.json()), error: null }
+    const body = (await response.json()) as { settings?: unknown }
+    return { settings: validateSettings(body?.settings ?? body), error: null }
   } catch (error) {
     return { settings: DEFAULT_SETTINGS, error: error instanceof Error ? error.message : 'Could not load settings' }
   }
