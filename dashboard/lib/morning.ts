@@ -6,6 +6,7 @@ export type SeaForecast = { wind?: string; sea?: string; weather?: string; visib
 export type Morning = {
   date: string
   generated_at?: string
+  port_name?: string
   tides: { type: 'high' | 'low'; at?: string; local: string; height_m: number | null }[]
   gates: { type: 'open' | 'close'; at?: string; local: string; for_hw?: string }[]
   daylight: {

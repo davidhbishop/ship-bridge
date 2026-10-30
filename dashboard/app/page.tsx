@@ -99,7 +99,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ d
       <AutoRefresh />
       <header className="header">
         <div>
-          <h1>{home.name}</h1>
+          <h1>{day?.port_name ?? home.name}</h1>
           <div className="sub">
             {formatDateKey(dateKey)}
             {nowMinutes !== null && ` · ${formatTime(String(Math.floor(nowMinutes / 60)).padStart(2, '0') + ':' + String(nowMinutes % 60).padStart(2, '0'))} UK time`}
