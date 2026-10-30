@@ -11,6 +11,8 @@
  * day folder an event was filed under, and all times shown are Europe/London.
  */
 
+import { shippingForecast } from "./shipping.js";
+
 const ZONE = "Europe/London";
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
@@ -30,6 +32,7 @@ export async function buildBriefing(env, now, options = {}) {
   const gates = gateWindows(extremes, config);
 
   const forecast = await readForecast(env, config, today);
+  const shipping = await shippingForecast(env, now).catch(() => ({ known: false }));
   const gate = config.hasGate
     ? gateStatus(gates, now, extremes.length > 0)
     : { known: false, status: "NO GATE", headline: "No gate here", detail: "" };
@@ -38,7 +41,7 @@ export async function buildBriefing(env, now, options = {}) {
   const sun = sunView(days[0], events, now, todayStart);
   const nextTide = extremes.find((e) => e.at > now.getTime());
 
-  const alerts = buildAlerts({ forecast, gate, extremes, config });
+  const alerts = buildAlerts({ forecast, shipping, gate, extremes, config });
   const level = alerts.length ? alerts[0].level : "none";
 
   return {
@@ -52,6 +55,7 @@ export async function buildBriefing(env, now, options = {}) {
     days,
     tide_curve: tideCurve(extremes, gates, todayStart, now),
     forecast,
+    shipping,
     alerts,
     alert_count: alerts.length,
     alert_level: level,
@@ -378,7 +382,7 @@ export function maxForce(text) {
 
 const RANK = { warning: 0, caution: 1, info: 2 };
 
-function buildAlerts({ forecast, gate, extremes, config }) {
+function buildAlerts({ forecast, shipping, gate, extremes, config }) {
   const alerts = [];
   const add = (level, title, detail) => alerts.push({ level, icon: level === "warning" ? "!" : "i", title, detail });
 
@@ -397,6 +401,12 @@ function buildAlerts({ forecast, gate, extremes, config }) {
     if (forecast.stale) add("caution", "Forecast not updated today", `Showing ${forecast.issued}. Check the inshore worker.`);
   } else {
     add("caution", "No inshore forecast", "Nothing in R2 for today or yesterday");
+  }
+
+  // The shipping forecast covers the open sea beyond the inshore area.
+  const sea = shipping && shipping.known ? shipping.area : null;
+  if (sea && (sea.gale || sea.warning) && !alerts.some((a) => a.level === "warning")) {
+    add("warning", `Gale warning: ${sea.name}`, sea.warning || sea.wind);
   }
 
   if (!extremes.length) {

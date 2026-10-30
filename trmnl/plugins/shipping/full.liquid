@@ -1,0 +1,51 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% assign sea = shipping.area %}
+  {% if shipping.known %}
+  {% if sea.gale or sea.warning != '' %}
+  <div class="alert warning"><span class="mark">&#9888;</span><div class="grow lg clamp2">{% if sea.warning != '' %}{{ sea.warning }}{% else %}Gale warning in {{ sea.name }}{% endif %}</div></div>
+  {% elsif shipping.gale_count > 0 %}
+  <div class="alert caution"><span class="mark">&#9888;</span><div class="grow md clamp2">Gale warnings: {{ shipping.gale_warnings | join: ", " }}</div></div>
+  {% endif %}
+  <div class="row fixed" style="align-items: baseline; justify-content: space-between;">
+    <span class="lg clip">{{ sea.name }}</span>
+    <span class="sm fixed">Issued {{ shipping.issued }}{% if shipping.stale %} (old){% endif %}</span>
+  </div>
+  <div class="panel fixed">
+    <div class="cap"><span>General synopsis</span></div>
+    <div class="body sm clamp2">{{ shipping.synopsis }}</div>
+  </div>
+  <div class="panel grow">
+    <div class="cap"><span>Wind</span>{% if sea.max_force %}<span>max force {{ sea.max_force }}</span>{% endif %}</div>
+    <div class="body lg clamp2">{{ sea.wind }}</div>
+  </div>
+  <div class="row grow">
+    <div class="panel grow">
+      <div class="cap"><span>Sea state</span></div>
+      <div class="body md clamp2">{{ sea.sea }}</div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Weather</span></div>
+      <div class="body md clamp2">{{ sea.weather }}</div>
+    </div>
+    <div class="panel grow">
+      <div class="cap"><span>Visibility</span></div>
+      <div class="body md clamp2">{{ sea.visibility }}</div>
+    </div>
+  </div>
+  {% if shipping.nearby.size > 0 %}
+  <div class="row fixed">
+    {% for n in shipping.nearby %}
+    <div class="panel grow"><div class="cap"><span>{{ n.name }}</span>{% if n.gale %}<span>GALE</span>{% elsif n.max_force %}<span>F{{ n.max_force }}</span>{% endif %}</div><div class="body xs clamp2">{{ n.wind }} {{ n.sea }}</div></div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% else %}
+  <div class="panel grow"><div class="cap"><span>Shipping forecast</span></div><div class="body xl" style="padding-top: 100px; text-align: center;">No shipping forecast in R2</div></div>
+  {% endif %}
+</div>
+</div>
+<div class="title_bar">
+  <span class="title">Shipping forecast</span>
+  <span class="instance">For the log &middot; updated {{ updated }}</span>
+</div>

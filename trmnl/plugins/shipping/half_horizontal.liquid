@@ -1,0 +1,17 @@
+<div class="layout layout--top layout--stretch">
+<div class="sb">
+  {% assign sea = shipping.area %}
+  {% if shipping.known %}
+  {% if sea.gale or sea.warning != '' %}<div class="alert warning"><span class="md clip">&#9888; {% if sea.warning != '' %}{{ sea.warning }}{% else %}Gale warning in {{ sea.name }}{% endif %}</span></div>{% endif %}
+  <div class="panel grow"><div class="cap"><span>{{ sea.name }} &middot; wind</span>{% if sea.max_force %}<span>F{{ sea.max_force }}</span>{% endif %}</div><div class="body md clamp2">{{ sea.wind }}</div></div>
+  <div class="row grow">
+    <div class="panel grow"><div class="cap"><span>Sea</span></div><div class="body sm clamp2">{{ sea.sea }}</div></div>
+    <div class="panel grow"><div class="cap"><span>Weather</span></div><div class="body sm clamp2">{{ sea.weather }}</div></div>
+    <div class="panel grow"><div class="cap"><span>Visibility</span></div><div class="body sm clamp2">{{ sea.visibility }}</div></div>
+  </div>
+  {% else %}
+  <div class="panel grow"><div class="body lg">No shipping forecast</div></div>
+  {% endif %}
+</div>
+</div>
+<div class="title_bar"><span class="title">Shipping forecast</span><span class="instance">Issued {{ shipping.issued }}</span></div>
